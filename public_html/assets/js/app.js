@@ -200,14 +200,12 @@ function showCartNotification(count) {
 }
 
 function openCart() {
-    document.getElementById('cart-drawer').classList.remove('translate-x-full');
-    document.getElementById('cart-backdrop').classList.remove('hidden');
+    document.getElementById('cart-drawer').style.transform = 'translateX(0)';
     loadCart();
 }
 
 function closeCart() {
-    document.getElementById('cart-drawer').classList.add('translate-x-full');
-    document.getElementById('cart-backdrop').classList.add('hidden');
+    document.getElementById('cart-drawer').style.transform = 'translateX(100%)';
 }
 
 function loadCart() {
