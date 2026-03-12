@@ -1,7 +1,10 @@
 <?php
-require_once __DIR__ . '/../includes/admin-header.php';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/auth.php';
 
-$success = flash('success');
+$db = getDB();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
@@ -37,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+require_once __DIR__ . '/../includes/admin-header.php';
+
+$success = flash('success');
 $categories = $db->query("SELECT c.*, COUNT(p.id) as product_count FROM categories c LEFT JOIN products p ON p.category_id = c.id GROUP BY c.id ORDER BY c.sort_order, c.name")->fetchAll();
 ?>
 

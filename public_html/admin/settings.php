@@ -1,7 +1,10 @@
 <?php
-require_once __DIR__ . '/../includes/admin-header.php';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/auth.php';
 
-$success = flash('success');
+$db = getDB();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
@@ -62,6 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+require_once __DIR__ . '/../includes/admin-header.php';
+
+$success = flash('success');
 $colors = $db->query("SELECT * FROM colors ORDER BY name")->fetchAll();
 $admins = $db->query("SELECT * FROM admins ORDER BY login")->fetchAll();
 
