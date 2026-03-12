@@ -42,11 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'update_api') {
-        $keys = [
-            'payplug_test_secret', 'payplug_test_public',
-            'payplug_live_secret', 'payplug_live_public',
-            'packlink_api'
-        ];
+        $keys = ['payplug_test_secret', 'payplug_live_secret', 'packlink_api'];
         foreach ($keys as $k) {
             $val = trim($_POST[$k] ?? '');
             $stmt = $db->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
@@ -68,7 +64,7 @@ $success = flash('success');
 $admins = $db->query("SELECT * FROM admins ORDER BY login")->fetchAll();
 
 $api_settings = [];
-$api_keys = ['payplug_test_secret','payplug_test_public','payplug_live_secret','payplug_live_public','payplug_mode','packlink_api'];
+$api_keys = ['payplug_test_secret','payplug_live_secret','payplug_mode','packlink_api'];
 $placeholders = implode(',', array_fill(0, count($api_keys), '?'));
 $stmt = $db->prepare("SELECT key, value FROM settings WHERE key IN ($placeholders)");
 $stmt->execute($api_keys);
@@ -108,30 +104,20 @@ $payplug_mode = $api_settings['payplug_mode'] ?? 'test';
             </div>
 
             <div id="test-keys" class="space-y-3 <?= $payplug_mode === 'live' ? 'hidden' : '' ?>">
-                <h3 class="text-xs font-medium text-gray-400 uppercase tracking-wide">Clés Test</h3>
+                <h3 class="text-xs font-medium text-gray-400 uppercase tracking-wide">Clé Test</h3>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Clé secrète (Test)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Clé secrète Test</label>
                     <input type="text" name="payplug_test_secret" value="<?= h($api_settings['payplug_test_secret'] ?? '') ?>"
                            placeholder="sk_test_..." class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm font-mono">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Clé publique (Test)</label>
-                    <input type="text" name="payplug_test_public" value="<?= h($api_settings['payplug_test_public'] ?? '') ?>"
-                           placeholder="pk_test_..." class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm font-mono">
                 </div>
             </div>
 
             <div id="live-keys" class="space-y-3 <?= $payplug_mode === 'live' ? '' : 'hidden' ?>">
-                <h3 class="text-xs font-medium text-gray-400 uppercase tracking-wide">Clés Live</h3>
+                <h3 class="text-xs font-medium text-gray-400 uppercase tracking-wide">Clé Live</h3>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Clé secrète (Live)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Clé secrète Live</label>
                     <input type="text" name="payplug_live_secret" value="<?= h($api_settings['payplug_live_secret'] ?? '') ?>"
                            placeholder="sk_live_..." class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm font-mono">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Clé publique (Live)</label>
-                    <input type="text" name="payplug_live_public" value="<?= h($api_settings['payplug_live_public'] ?? '') ?>"
-                           placeholder="pk_live_..." class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm font-mono">
                 </div>
             </div>
 
