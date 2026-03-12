@@ -95,3 +95,16 @@ function flash($key, $message = null) {
         return $msg;
     }
 }
+
+function get_payplug_keys() {
+    $db = getDB();
+    $rows = $db->query("SELECT key, value FROM settings WHERE key IN ('payplug_mode','payplug_test_secret','payplug_test_public','payplug_live_secret','payplug_live_public')")->fetchAll();
+    $s = [];
+    foreach ($rows as $r) $s[$r['key']] = $r['value'];
+    $mode = $s['payplug_mode'] ?? 'test';
+    return [
+        'secret' => $s["payplug_{$mode}_secret"] ?? '',
+        'public' => $s["payplug_{$mode}_public"] ?? '',
+        'mode' => $mode,
+    ];
+}

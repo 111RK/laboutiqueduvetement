@@ -88,17 +88,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ],
         ];
 
-        $api_url = PAYPLUG_TEST_MODE
-            ? 'https://api.payplug.com/v1/payments'
-            : 'https://api.payplug.com/v1/payments';
+        $pp = get_payplug_keys();
 
-        $ch = curl_init($api_url);
+        $ch = curl_init('https://api.payplug.com/v1/payments');
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => json_encode($payplug_data),
             CURLOPT_HTTPHEADER => [
-                'Authorization: Bearer ' . PAYPLUG_SECRET_KEY,
+                'Authorization: Bearer ' . $pp['secret'],
                 'Content-Type: application/json',
                 'PayPlug-Version: 2019-08-06',
             ],

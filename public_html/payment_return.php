@@ -9,12 +9,13 @@ $stmt = $db->prepare("SELECT * FROM orders WHERE order_ref = ?");
 $stmt->execute([$order_ref]);
 $order = $stmt->fetch();
 
-if ($order && $order['payment_id'] && PAYPLUG_SECRET_KEY) {
+$pp = get_payplug_keys();
+if ($order && $order['payment_id'] && $pp['secret']) {
     $ch = curl_init('https://api.payplug.com/v1/payments/' . $order['payment_id']);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => [
-            'Authorization: Bearer ' . PAYPLUG_SECRET_KEY,
+            'Authorization: Bearer ' . $pp['secret'],
             'PayPlug-Version: 2019-08-06',
         ],
     ]);
