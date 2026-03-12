@@ -1,7 +1,7 @@
 </main>
 
-<div id="cart-backdrop" class="fixed inset-0 bg-black/30 z-50 hidden sm:hidden" onclick="closeCart()"></div>
-<div id="cart-drawer" class="fixed right-0 top-0 bottom-0 z-50 w-full sm:max-w-sm bg-white shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
+<div id="cart-backdrop" class="fixed inset-0 bg-black/30 z-[55] hidden" onclick="closeCart()"></div>
+<div id="cart-drawer" class="fixed right-0 top-0 bottom-0 z-[60] w-full sm:max-w-sm bg-white shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
     <div class="p-4 border-b flex items-center justify-between">
         <h2 class="text-lg font-bold">Mon Panier</h2>
         <button onclick="closeCart()" class="p-2 hover:bg-gray-100 rounded-full">
@@ -63,6 +63,6 @@
     </div>
 </nav>
 
-<script src="assets/js/app.js"></script>
+<script src="assets/js/app.js?v=<?= filemtime(__DIR__ . '/../assets/js/app.js') ?: time() ?>"></script>
 </body>
 </html>
