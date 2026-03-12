@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = trim($_POST['address'] ?? '');
     $city = trim($_POST['city'] ?? '');
     $zipcode = trim($_POST['zipcode'] ?? '');
+    $country = trim($_POST['country'] ?? 'FR');
 
     if (!$name) $errors[] = 'Nom requis';
     if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Email valide requis';
@@ -42,13 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $db = getDB();
         $stmt = $db->prepare("
             INSERT INTO orders (order_ref, customer_name, customer_email, customer_phone,
-                customer_address, customer_city, customer_zipcode, items_json,
+                customer_address, customer_city, customer_zipcode, customer_country, items_json,
                 subtotal, shipping_cost, shipping_method, total, payment_status, order_status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'new')
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'new')
         ");
         $stmt->execute([
             $order_ref, $name, $email, $phone,
-            $address, $city, $zipcode, json_encode(array_values($cart)),
+            $address, $city, $zipcode, $country, json_encode(array_values($cart)),
             $subtotal, $shipping_cost, $shipping_method, $total
         ]);
 
@@ -66,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'address1' => $address,
                 'postcode' => $zipcode,
                 'city' => $city,
-                'country' => 'FR',
+                'country' => $country,
             ],
             'shipping' => [
                 'first_name' => explode(' ', $name)[0],
@@ -75,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'address1' => $address,
                 'postcode' => $zipcode,
                 'city' => $city,
-                'country' => 'FR',
+                'country' => $country,
             ],
             'hosted_payment' => [
                 'return_url' => (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/payment_return.php?order=' . $order_ref,
@@ -197,14 +198,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                        value="<?= h($_POST['phone'] ?? '') ?>"
                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
                 <div class="sm:col-span-2">
-                    <input type="text" name="address" placeholder="Adresse" required
+                    <select name="country" id="country-field"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        <option value="FR" selected>France</option>
+                        <option value="BE">Belgique</option>
+                        <option value="LU">Luxembourg</option>
+                        <option value="DE">Allemagne</option>
+                        <option value="ES">Espagne</option>
+                        <option value="IT">Italie</option>
+                        <option value="PT">Portugal</option>
+                        <option value="NL">Pays-Bas</option>
+                        <option value="AT">Autriche</option>
+                        <option value="CH">Suisse</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2 relative">
+                    <input type="text" name="address" id="address-field" placeholder="Adresse" required autocomplete="off"
                            value="<?= h($_POST['address'] ?? '') ?>"
                            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <div id="address-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 hidden max-h-48 overflow-y-auto"></div>
                 </div>
-                <input type="text" name="zipcode" placeholder="Code postal" required
+                <input type="text" name="zipcode" id="zipcode-field" placeholder="Code postal" required
                        value="<?= h($_POST['zipcode'] ?? '') ?>"
                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                <input type="text" name="city" placeholder="Ville" required
+                <input type="text" name="city" id="city-field" placeholder="Ville" required
                        value="<?= h($_POST['city'] ?? '') ?>"
                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
             </div>
@@ -238,8 +255,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
-    const zipField = document.querySelector('[name="zipcode"]');
-    const cityField = document.querySelector('[name="city"]');
+    const addressField = document.getElementById('address-field');
+    const zipField = document.getElementById('zipcode-field');
+    const cityField = document.getElementById('city-field');
+    const countryField = document.getElementById('country-field');
+    const suggestionsBox = document.getElementById('address-suggestions');
+    let addrDebounce;
+
+    addressField.addEventListener('input', function() {
+        clearTimeout(addrDebounce);
+        const q = this.value.trim();
+        if (q.length < 3) { suggestionsBox.classList.add('hidden'); return; }
+        addrDebounce = setTimeout(() => fetchAddressSuggestions(q), 300);
+    });
+
+    addressField.addEventListener('blur', function() {
+        setTimeout(() => suggestionsBox.classList.add('hidden'), 200);
+    });
+
+    function fetchAddressSuggestions(query) {
+        const country = countryField.value;
+
+        if (country === 'FR') {
+            fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(query) + '&limit=5&autocomplete=1')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.features || !data.features.length) { suggestionsBox.classList.add('hidden'); return; }
+                    let html = '';
+                    data.features.forEach(f => {
+                        const p = f.properties;
+                        html += `<div class="px-4 py-2.5 hover:bg-primary-50 cursor-pointer text-sm border-b last:border-0" onclick="pickAddress('${escAttr(p.name)}','${escAttr(p.postcode || '')}','${escAttr(p.city || '')}')">
+                            <p class="font-medium">${esc(p.label)}</p>
+                            <p class="text-xs text-gray-400">${esc(p.postcode || '')} ${esc(p.city || '')}</p>
+                        </div>`;
+                    });
+                    suggestionsBox.innerHTML = html;
+                    suggestionsBox.classList.remove('hidden');
+                })
+                .catch(() => suggestionsBox.classList.add('hidden'));
+        } else {
+            fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(query) + '&limit=5&lang=fr&osm_tag=place&osm_tag=highway&layer=address&layer=street' +
+                '&bbox=-10,35,30,72')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.features || !data.features.length) { suggestionsBox.classList.add('hidden'); return; }
+                    let html = '';
+                    data.features.forEach(f => {
+                        const p = f.properties;
+                        const street = p.street || p.name || '';
+                        const houseNum = p.housenumber || '';
+                        const addr = houseNum ? houseNum + ' ' + street : street;
+                        const zip = p.postcode || '';
+                        const city = p.city || p.town || p.village || '';
+                        const ctry = p.country || '';
+                        html += `<div class="px-4 py-2.5 hover:bg-primary-50 cursor-pointer text-sm border-b last:border-0" onclick="pickAddress('${escAttr(addr)}','${escAttr(zip)}','${escAttr(city)}')">
+                            <p class="font-medium">${esc(addr)}</p>
+                            <p class="text-xs text-gray-400">${esc(zip)} ${esc(city)} ${esc(ctry)}</p>
+                        </div>`;
+                    });
+                    suggestionsBox.innerHTML = html;
+                    suggestionsBox.classList.remove('hidden');
+                })
+                .catch(() => suggestionsBox.classList.add('hidden'));
+        }
+    }
+
+    function pickAddress(addr, zip, city) {
+        addressField.value = addr;
+        zipField.value = zip;
+        cityField.value = city;
+        suggestionsBox.classList.add('hidden');
+        checkShipping();
+    }
+
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function escAttr(s) { return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
     let shippingDebounce;
 
     function checkShipping() {
