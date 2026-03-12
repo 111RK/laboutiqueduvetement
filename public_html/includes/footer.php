@@ -1,9 +1,10 @@
 </main>
 
-<div id="cart-drawer" class="fixed right-0 top-0 bottom-0 z-50 w-full max-w-sm bg-white shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
+<div id="cart-backdrop" class="fixed inset-0 bg-black/30 z-50 hidden sm:hidden" onclick="closeCart()"></div>
+<div id="cart-drawer" class="fixed right-0 top-0 bottom-0 z-50 w-full sm:max-w-sm bg-white shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
     <div class="p-4 border-b flex items-center justify-between">
         <h2 class="text-lg font-bold">Mon Panier</h2>
-        <button onclick="closeCart()" class="p-1 hover:bg-gray-100 rounded-full">
+        <button onclick="closeCart()" class="p-2 hover:bg-gray-100 rounded-full">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -12,7 +13,7 @@
     <div id="cart-items" class="flex-1 overflow-y-auto p-4">
         <p class="text-gray-400 text-center py-8">Votre panier est vide</p>
     </div>
-    <div id="cart-footer" class="border-t p-4 hidden">
+    <div id="cart-footer" class="border-t p-4 pb-20 sm:pb-4 hidden">
         <div class="flex justify-between font-bold text-lg mb-4">
             <span>Total</span>
             <span id="cart-total">0,00 €</span>

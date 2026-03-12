@@ -200,13 +200,14 @@ function showCartNotification(count) {
 }
 
 function openCart() {
-    const drawer = document.getElementById('cart-drawer');
-    drawer.classList.remove('translate-x-full');
+    document.getElementById('cart-drawer').classList.remove('translate-x-full');
+    document.getElementById('cart-backdrop').classList.remove('hidden');
     loadCart();
 }
 
 function closeCart() {
     document.getElementById('cart-drawer').classList.add('translate-x-full');
+    document.getElementById('cart-backdrop').classList.add('hidden');
 }
 
 function loadCart() {
