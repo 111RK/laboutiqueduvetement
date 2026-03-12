@@ -1,4 +1,8 @@
 <?php
+$page_title = 'Vêtements personnalisés adulte et enfant';
+$page_description = 'Découvrez notre collection de vêtements personnalisés : t-shirts, sweats pour adultes et enfants. Livraison rapide en France. À partir de 5€.';
+$page_canonical = '';
+
 require_once __DIR__ . '/includes/header.php';
 
 $products = $db->query("
@@ -13,7 +17,52 @@ $products = $db->query("
 ")->fetchAll();
 ?>
 
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "<?= SITE_NAME ?>",
+    "description": "Boutique en ligne de vêtements personnalisés pour adultes et enfants",
+    "url": "https://laboutiqueduvetement.fr",
+    "currenciesAccepted": "EUR",
+    "paymentAccepted": "Carte bancaire",
+    "areaServed": "FR"
+}
+</script>
+
+<?php if (!empty($products)): ?>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+        <?php foreach ($products as $i => $prod): ?>
+        {
+            "@type": "ListItem",
+            "position": <?= $i + 1 ?>,
+            "item": {
+                "@type": "Product",
+                "name": "<?= h($prod['title']) ?>",
+                <?php if ($prod['image']): ?>"image": "https://laboutiqueduvetement.fr/<?= h(UPLOAD_URL . $prod['image']) ?>",<?php endif; ?>
+                <?php if ($prod['min_price'] !== null): ?>
+                "offers": {
+                    "@type": "AggregateOffer",
+                    "lowPrice": "<?= $prod['min_price'] ?>",
+                    "highPrice": "<?= $prod['max_price'] ?>",
+                    "priceCurrency": "EUR",
+                    "availability": "https://schema.org/InStock"
+                }
+                <?php endif; ?>
+            }
+        }<?= $i < count($products) - 1 ? ',' : '' ?>
+        <?php endforeach; ?>
+    ]
+}
+</script>
+<?php endif; ?>
+
 <div class="max-w-7xl mx-auto px-4">
+    <h1 class="sr-only"><?= SITE_NAME ?> - Vêtements personnalisés</h1>
     <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
         <?php if (empty($products)): ?>
             <div class="col-span-full text-center py-16">
@@ -25,15 +74,17 @@ $products = $db->query("
             </div>
         <?php else: ?>
             <?php foreach ($products as $prod): ?>
-            <div class="product-card bg-white rounded-xl overflow-hidden shadow-sm cursor-pointer"
+            <article class="product-card bg-white rounded-xl overflow-hidden shadow-sm cursor-pointer"
                  data-category="<?= h($prod['category_slug'] ?? 'none') ?>"
-                 onclick="openProduct(<?= $prod['id'] ?>)">
+                 onclick="openProduct(<?= $prod['id'] ?>)"
+                 itemscope itemtype="https://schema.org/Product">
                 <div class="aspect-square bg-gray-100 overflow-hidden">
                     <?php if ($prod['image']): ?>
                         <img src="<?= h(UPLOAD_URL . $prod['image']) ?>"
-                             alt="<?= h($prod['title']) ?>"
+                             alt="<?= h($prod['title']) ?> - <?= h($prod['category_name'] ?? 'vêtement') ?> personnalisé"
                              class="w-full h-full object-cover"
-                             loading="lazy">
+                             loading="lazy"
+                             itemprop="image">
                     <?php else: ?>
                         <div class="w-full h-full flex items-center justify-center">
                             <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -43,12 +94,15 @@ $products = $db->query("
                     <?php endif; ?>
                 </div>
                 <div class="p-3">
-                    <h3 class="font-medium text-sm truncate"><?= h($prod['title']) ?></h3>
+                    <h3 class="font-medium text-sm truncate" itemprop="name"><?= h($prod['title']) ?></h3>
                     <?php if ($prod['category_name']): ?>
-                        <p class="text-xs text-gray-400 mt-0.5"><?= h($prod['category_name']) ?></p>
+                        <p class="text-xs text-gray-400 mt-0.5 product-category"><?= h($prod['category_name']) ?></p>
                     <?php endif; ?>
-                    <div class="mt-1.5">
+                    <div class="mt-1.5" itemprop="offers" itemscope itemtype="https://schema.org/AggregateOffer">
+                        <meta itemprop="priceCurrency" content="EUR">
                         <?php if ($prod['min_price'] !== null): ?>
+                            <meta itemprop="lowPrice" content="<?= $prod['min_price'] ?>">
+                            <meta itemprop="highPrice" content="<?= $prod['max_price'] ?>">
                             <?php if ($prod['min_price'] == $prod['max_price']): ?>
                                 <span class="text-primary-700 font-bold text-sm"><?= format_price($prod['min_price']) ?></span>
                             <?php else: ?>
@@ -57,7 +111,7 @@ $products = $db->query("
                         <?php endif; ?>
                     </div>
                 </div>
-            </div>
+            </article>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>

@@ -11,7 +11,18 @@ $cart_count = isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= SITE_NAME ?></title>
+    <title><?= isset($page_title) ? h($page_title) . ' | ' . SITE_NAME : SITE_NAME ?></title>
+    <meta name="description" content="<?= h($page_description ?? 'Boutique en ligne de vêtements personnalisés pour adultes et enfants. T-shirts, sweats et plus. Livraison rapide en France.') ?>">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://laboutiqueduvetement.fr/<?= h($page_canonical ?? '') ?>">
+    <meta property="og:title" content="<?= h(isset($page_title) ? $page_title . ' | ' . SITE_NAME : SITE_NAME) ?>">
+    <meta property="og:description" content="<?= h($page_description ?? 'Boutique en ligne de vêtements personnalisés pour adultes et enfants.') ?>">
+    <meta property="og:type" content="<?= $page_og_type ?? 'website' ?>">
+    <meta property="og:url" content="https://laboutiqueduvetement.fr/<?= h($page_canonical ?? '') ?>">
+    <?php if (!empty($page_image)): ?><meta property="og:image" content="https://laboutiqueduvetement.fr/<?= h($page_image) ?>"><?php endif; ?>
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:site_name" content="<?= SITE_NAME ?>">
+    <meta name="twitter:card" content="summary_large_image">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {

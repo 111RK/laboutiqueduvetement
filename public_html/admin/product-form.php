@@ -54,9 +54,16 @@ $title = $product ? 'Modifier le produit' : 'Ajouter un produit';
 
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea name="description" rows="3"
-                      class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="Description du produit..."><?= h($product['description'] ?? '') ?></textarea>
+            <div class="relative">
+                <textarea name="description" id="description-field" rows="3"
+                          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          placeholder="Description du produit..."><?= h($product['description'] ?? '') ?></textarea>
+                <button type="button" onclick="generateDescription()"
+                        class="absolute top-2 right-2 bg-primary-100 text-primary-700 px-3 py-1 rounded-lg text-xs font-medium hover:bg-primary-200 transition">
+                    Auto-générer
+                </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">Cliquez "Auto-générer" pour créer une description SEO basée sur le titre</p>
         </div>
 
         <div class="mb-4">
@@ -184,4 +191,129 @@ $title = $product ? 'Modifier le produit' : 'Ajouter un produit';
     </div>
 </form>
 
+<script>
+function generateDescription() {
+    const title = document.querySelector('[name="title"]').value.trim();
+    const catSelect = document.querySelector('[name="category_id"]');
+    const catName = catSelect.options[catSelect.selectedIndex]?.text?.trim() || '';
+    const desc = document.getElementById('description-field');
+
+    if (!title) {
+        alert('Renseignez d\'abord le titre du produit.');
+        return;
+    }
+
+    const checkedSizes = [];
+    document.querySelectorAll('input[type="checkbox"][name*="[active]"]:checked').forEach(cb => {
+        const label = cb.closest('.flex')?.querySelector('span')?.textContent?.trim();
+        if (label) checkedSizes.push(label);
+    });
+
+    const checkedColors = [];
+    document.querySelectorAll('input[type="checkbox"][name="colors[]"]:checked').forEach(cb => {
+        const label = cb.closest('label')?.querySelector('span')?.textContent?.trim();
+        if (label) checkedColors.push(label);
+    });
+
+    const titleLower = title.toLowerCase();
+    let visual = '';
+
+    const keywords = {
+        'fleur': 'un motif floral élégant',
+        'rose': 'un design aux tons rosés',
+        'coeur': 'un motif cœur tendance',
+        'étoile': 'un design étoilé scintillant',
+        'star': 'un design étoilé',
+        'animal': 'un imprimé animalier',
+        'chat': 'un adorable motif chat',
+        'chien': 'un motif chien attachant',
+        'lion': 'un imprimé lion majestueux',
+        'papillon': 'un motif papillon délicat',
+        'dragon': 'un design dragon audacieux',
+        'skull': 'un motif tête de mort stylisé',
+        'tête de mort': 'un motif tête de mort stylisé',
+        'flamme': 'un design flammes dynamique',
+        'tribal': 'un motif tribal graphique',
+        'mandala': 'un motif mandala apaisant',
+        'geometr': 'un design géométrique moderne',
+        'abstrait': 'un motif abstrait artistique',
+        'vintage': 'un style rétro vintage',
+        'retro': 'un style rétro tendance',
+        'surf': 'un design esprit surf et plage',
+        'montagne': 'un motif montagne nature',
+        'nature': 'un design inspiré de la nature',
+        'lune': 'un motif lune mystique',
+        'soleil': 'un design soleil lumineux',
+        'space': 'un design spatial cosmique',
+        'galaxie': 'un motif galaxie envoûtant',
+        'musique': 'un design musical',
+        'rock': 'un design rock\'n\'roll',
+        'sport': 'un motif sportif dynamique',
+        'foot': 'un design football',
+        'basket': 'un design basketball',
+        'drapeau': 'un motif drapeau patriotique',
+        'france': 'un design aux couleurs de la France',
+        'noël': 'un motif festif de Noël',
+        'halloween': 'un design Halloween',
+        'humour': 'un visuel humoristique',
+        'drôle': 'un design fun et décalé',
+        'citation': 'une citation inspirante',
+        'texte': 'un message typographique',
+        'logo': 'un logo moderne',
+        'paillette': 'un effet pailleté brillant',
+        'tie-dye': 'un effet tie-dye coloré',
+        'camouflage': 'un imprimé camouflage',
+        'rayure': 'un motif rayé classique'
+    };
+
+    for (const [key, desc_text] of Object.entries(keywords)) {
+        if (titleLower.includes(key)) {
+            visual = desc_text;
+            break;
+        }
+    }
+
+    if (!visual) {
+        visual = 'un visuel original et tendance';
+    }
+
+    let type = 'vêtement';
+    if (titleLower.includes('t-shirt') || titleLower.includes('tshirt') || titleLower.includes('tee')) type = 't-shirt';
+    else if (titleLower.includes('sweat')) type = 'sweat';
+    else if (titleLower.includes('hoodie') || titleLower.includes('capuche')) type = 'hoodie';
+    else if (titleLower.includes('polo')) type = 'polo';
+    else if (titleLower.includes('débardeur') || titleLower.includes('tank')) type = 'débardeur';
+    else if (titleLower.includes('veste')) type = 'veste';
+    else if (titleLower.includes('pantalon')) type = 'pantalon';
+    else if (titleLower.includes('short')) type = 'short';
+    else if (titleLower.includes('casquette') || titleLower.includes('bonnet')) type = 'accessoire';
+    else if (titleLower.includes('body') || titleLower.includes('bébé')) type = 'body bébé';
+
+    let description = `${title} — ${type.charAt(0).toUpperCase() + type.slice(1)} orné de ${visual}.`;
+
+    if (catName && catName !== '— Sans catégorie —') {
+        description += ` Idéal dans notre collection ${catName}.`;
+    }
+
+    if (checkedColors.length) {
+        description += ` Disponible en ${checkedColors.join(', ')}.`;
+    }
+
+    if (checkedSizes.length) {
+        const hasAdult = checkedSizes.some(s => ['XS','S','M','L','XL','XXL'].includes(s));
+        const hasChild = checkedSizes.some(s => s.includes('ans'));
+        if (hasAdult && hasChild) {
+            description += ' Tailles adulte et enfant disponibles.';
+        } else if (hasChild) {
+            description += ' Tailles enfant disponibles.';
+        } else {
+            description += ' Tailles adulte disponibles.';
+        }
+    }
+
+    description += ' Qualité premium, impression durable. Livraison rapide en France.';
+
+    desc.value = description;
+}
+</script>
 <?php require_once __DIR__ . '/../includes/admin-footer.php'; ?>
