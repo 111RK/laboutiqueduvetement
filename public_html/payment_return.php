@@ -56,7 +56,12 @@ $success = $order && $order['payment_status'] === 'paid';
             <h1 class="text-2xl font-bold mb-2">Merci pour votre commande !</h1>
             <p class="text-gray-500 mb-2">Votre paiement a été accepté.</p>
             <p class="text-sm text-gray-400 mb-6">Référence : <strong><?= h($order_ref) ?></strong></p>
-            <p class="text-sm text-gray-500 mb-6">Un email de confirmation vous sera envoyé à <strong><?= h($order['customer_email']) ?></strong></p>
+            <p class="text-sm text-gray-500 mb-4">Un email de confirmation vous sera envoyé à <strong><?= h($order['customer_email']) ?></strong></p>
+            <a href="facture?ref=<?= urlencode($order_ref) ?>&email=<?= urlencode($order['customer_email']) ?>"
+               class="inline-flex items-center gap-2 text-primary-600 hover:underline text-sm font-medium mb-4">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Télécharger ma facture
+            </a>
         <?php else: ?>
             <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +71,7 @@ $success = $order && $order['payment_status'] === 'paid';
             <h1 class="text-2xl font-bold mb-2">Paiement en attente</h1>
             <p class="text-gray-500 mb-6">Le paiement n'a pas encore été confirmé. Veuillez réessayer ou nous contacter.</p>
         <?php endif; ?>
-        <a href="index.php" class="inline-block bg-teal-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-teal-700 transition">
+        <a href="/" class="inline-block bg-teal-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-teal-700 transition">
             Retour à la boutique
         </a>
     </div>

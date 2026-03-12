@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $_SESSION['customer_id'] = $customer_id;
-            header('Location: track.php');
+            header('Location: track');
             exit;
         } else {
             $error = 'Mot de passe trop court (minimum 6 caractères).';
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($cust && password_verify($password, $cust['password_hash'])) {
             $_SESSION['customer_id'] = $cust['id'];
-            header('Location: track.php');
+            header('Location: track');
             exit;
         } else {
             $error = 'Identifiants incorrects.';
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if (isset($_GET['logout'])) {
     unset($_SESSION['customer_id']);
-    header('Location: track.php');
+    header('Location: track');
     exit;
 }
 
@@ -124,7 +124,7 @@ $status_labels = [
 <header class="bg-white shadow-sm">
     <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <a href="index.php" class="text-gray-400 hover:text-gray-600">
+            <a href="/" class="text-gray-400 hover:text-gray-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
@@ -245,7 +245,7 @@ $status_labels = [
             </div>
         <?php endif; ?>
 
-        <a href="track.php" class="block mt-4 text-center text-primary-600 hover:underline text-sm">Rechercher une autre commande</a>
+        <a href="track" class="block mt-4 text-center text-primary-600 hover:underline text-sm">Rechercher une autre commande</a>
 
     <?php else: ?>
         <div class="space-y-6">

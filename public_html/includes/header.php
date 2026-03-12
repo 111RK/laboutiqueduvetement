@@ -56,7 +56,7 @@ $cart_count = isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'
 
 <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a href="index.php" class="flex items-center gap-2">
+        <a href="/" class="flex items-center gap-2">
             <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
@@ -76,7 +76,7 @@ $cart_count = isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'
         </div>
 
         <div class="flex items-center gap-1">
-            <a href="track.php" class="p-2 hover:bg-gray-100 rounded-full transition hidden sm:block" title="Suivi commande">
+            <a href="track" class="p-2 hover:bg-gray-100 rounded-full transition hidden sm:block" title="Suivi commande">
                 <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>

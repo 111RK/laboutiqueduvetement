@@ -76,7 +76,7 @@ require_once __DIR__ . '/includes/header.php';
 
         <section>
             <h2 class="text-lg font-bold text-gray-900 mb-3">9. Protection des données</h2>
-            <p>Les données personnelles collectées sont traitées conformément à notre <a href="politique-confidentialite.php" class="text-primary-600 hover:underline">Politique de confidentialité</a> et au RGPD.</p>
+            <p>Les données personnelles collectées sont traitées conformément à notre <a href="politique-confidentialite" class="text-primary-600 hover:underline">Politique de confidentialité</a> et au RGPD.</p>
         </section>
 
         <section>

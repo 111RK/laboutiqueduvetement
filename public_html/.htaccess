@@ -9,8 +9,21 @@ RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 RewriteCond %{HTTPS} off
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Redirect .php URLs to clean URLs (except API/AJAX)
+RewriteCond %{THE_REQUEST} \s/(.+?)\.php[\s?] [NC]
+RewriteCond %{THE_REQUEST} !api_ [NC]
+RewriteCond %{THE_REQUEST} !admin/ [NC]
+RewriteCond %{THE_REQUEST} !payment_ [NC]
+RewriteRule ^ /%1 [R=301,L]
+
 # Clean product URLs
 RewriteRule ^produit/([a-z0-9-]+)$ produit.php?slug=$1 [L,QSA]
+
+# Remove .php extension - serve file if it exists
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.+)$ $1.php [L]
 
 # Block access to data directory
 RewriteRule ^data/ - [F,L]
@@ -21,11 +34,27 @@ RewriteRule ^includes/ - [F,L]
 # Block .sqlite files
 RewriteRule \.sqlite$ - [F,L]
 
-# Security headers
+# Hide PHP
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set X-XSS-Protection "1; mode=block"
+    # Remove X-Powered-By header
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+    # Hide Server info
+    ServerSignature Off
+</IfModule>
+
+# Disable PHP version exposure
+<IfModule mod_php.c>
+    php_flag expose_php Off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag expose_php Off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag expose_php Off
 </IfModule>
 
 # Compress

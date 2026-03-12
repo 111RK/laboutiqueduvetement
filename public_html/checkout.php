@@ -4,7 +4,7 @@ require_once __DIR__ . '/includes/functions.php';
 
 $cart = $_SESSION['cart'] ?? [];
 if (empty($cart)) {
-    header('Location: index.php');
+    header('Location: /');
     exit;
 }
 
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ],
             'hosted_payment' => [
                 'return_url' => (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/payment_return.php?order=' . $order_ref,
-                'cancel_url' => (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/checkout.php',
+                'cancel_url' => (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/checkout',
             ],
             'notification_url' => (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/payment_webhook.php',
             'metadata' => [
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <header class="bg-white shadow-sm">
     <div class="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
-        <a href="index.php" class="text-gray-400 hover:text-gray-600">
+        <a href="/" class="text-gray-400 hover:text-gray-600">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>

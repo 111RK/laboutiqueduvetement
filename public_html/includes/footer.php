@@ -18,7 +18,7 @@
                 <span>Total</span>
                 <span id="cart-total">0,00 €</span>
             </div>
-            <a href="checkout.php" class="block w-full bg-primary-600 text-white text-center py-3 rounded-xl font-medium hover:bg-primary-700 transition">
+            <a href="checkout" class="block w-full bg-primary-600 text-white text-center py-3 rounded-xl font-medium hover:bg-primary-700 transition">
                 Commander
             </a>
         </div>
@@ -38,10 +38,11 @@
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
             <p>&copy; <?= date('Y') ?> <?= SITE_NAME ?> — Tous droits réservés</p>
             <div class="flex flex-wrap gap-4">
-                <a href="track.php" class="hover:text-primary-600 transition">Suivi de commande</a>
-                <a href="mentions-legales.php" class="hover:text-primary-600 transition">Mentions légales</a>
-                <a href="cgv.php" class="hover:text-primary-600 transition">CGV</a>
-                <a href="politique-confidentialite.php" class="hover:text-primary-600 transition">Confidentialité</a>
+                <a href="track" class="hover:text-primary-600 transition">Suivi de commande</a>
+                <a href="facture" class="hover:text-primary-600 transition">Ma facture</a>
+                <a href="mentions-legales" class="hover:text-primary-600 transition">Mentions légales</a>
+                <a href="cgv" class="hover:text-primary-600 transition">CGV</a>
+                <a href="politique-confidentialite" class="hover:text-primary-600 transition">Confidentialité</a>
             </div>
         </div>
     </div>
@@ -49,11 +50,11 @@
 
 <nav class="fixed bottom-0 left-0 right-0 bg-white border-t sm:hidden z-40 safe-area-bottom">
     <div class="flex justify-around py-2">
-        <a href="index.php" class="flex flex-col items-center gap-0.5 text-primary-600">
+        <a href="/" class="flex flex-col items-center gap-0.5 text-primary-600">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             <span class="text-[10px]">Accueil</span>
         </a>
-        <a href="track.php" class="flex flex-col items-center gap-0.5 text-gray-400">
+        <a href="track" class="flex flex-col items-center gap-0.5 text-gray-400">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             <span class="text-[10px]">Suivi</span>
         </a>
