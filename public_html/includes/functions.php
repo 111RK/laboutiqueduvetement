@@ -34,7 +34,6 @@ function upload_product_image($file) {
         mkdir(UPLOAD_DIR, 0755, true);
     }
 
-    // Resize image to max 800px width
     list($w, $h) = getimagesize($file['tmp_name']);
     $max_w = 800;
 

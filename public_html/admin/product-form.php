@@ -9,7 +9,6 @@ $product_colors = [];
 $categories = $db->query("SELECT * FROM categories ORDER BY sort_order, name")->fetchAll();
 $sizes = json_decode(SIZES, true);
 
-// Fetch predefined colors
 $colors_result = $db->query("SELECT * FROM colors ORDER BY name");
 $all_colors = $colors_result ? $colors_result->fetchAll() : [];
 
@@ -43,7 +42,6 @@ $title = $product ? 'Modifier le produit' : 'Ajouter un produit';
     <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
     <input type="hidden" name="id" value="<?= $id ?>">
 
-    <!-- Basic info -->
     <div class="bg-white rounded-xl shadow-sm p-5">
         <h2 class="font-bold mb-4">Informations</h2>
 
@@ -80,7 +78,6 @@ $title = $product ? 'Modifier le produit' : 'Ajouter un produit';
         </div>
     </div>
 
-    <!-- Image -->
     <div class="bg-white rounded-xl shadow-sm p-5">
         <h2 class="font-bold mb-4">Image du produit</h2>
         <?php if ($product && $product['image']): ?>
@@ -102,7 +99,6 @@ $title = $product ? 'Modifier le produit' : 'Ajouter un produit';
         </div>
     </div>
 
-    <!-- Colors -->
     <div class="bg-white rounded-xl shadow-sm p-5">
         <h2 class="font-bold mb-4">Couleurs disponibles</h2>
         <?php if (empty($all_colors)): ?>
@@ -124,11 +120,9 @@ $title = $product ? 'Modifier le produit' : 'Ajouter un produit';
         <?php endif; ?>
     </div>
 
-    <!-- Sizes & Prices -->
     <div class="bg-white rounded-xl shadow-sm p-5">
         <h2 class="font-bold mb-4">Tailles et tarifs</h2>
 
-        <!-- Adult sizes -->
         <div class="mb-6">
             <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">Adulte (défaut : 6,00 €)</h3>
             <div class="space-y-2">
@@ -155,7 +149,6 @@ $title = $product ? 'Modifier le produit' : 'Ajouter un produit';
             </div>
         </div>
 
-        <!-- Child sizes -->
         <div>
             <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">Enfant (défaut : 5,00 €)</h3>
             <div class="space-y-2">
@@ -183,7 +176,6 @@ $title = $product ? 'Modifier le produit' : 'Ajouter un produit';
         </div>
     </div>
 
-    <!-- Submit -->
     <div class="flex gap-3">
         <button type="submit" class="bg-primary-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-primary-700 transition">
             <?= $id ? 'Enregistrer les modifications' : 'Ajouter le produit' ?>

@@ -13,7 +13,6 @@ if (!$order) {
 
 $items = json_decode($order['items_json'], true) ?: [];
 
-// Handle tracking update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking'])) {
     csrf_verify();
     $tracking = trim($_POST['tracking']);
@@ -31,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking'])) {
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-4xl">
-    <!-- Customer -->
     <div class="bg-white rounded-xl shadow-sm p-5">
         <h2 class="font-bold mb-3">Client</h2>
         <p class="font-medium"><?= h($order['customer_name']) ?></p>
@@ -45,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking'])) {
         </p>
     </div>
 
-    <!-- Status -->
     <div class="bg-white rounded-xl shadow-sm p-5">
         <h2 class="font-bold mb-3">Statut</h2>
         <div class="space-y-2 text-sm">
@@ -71,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking'])) {
             <p>Livraison : <?= h($order['shipping_method'] ?: 'Non défini') ?></p>
         </div>
 
-        <!-- Tracking -->
         <form method="POST" class="mt-4 flex gap-2">
             <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
             <input type="text" name="tracking" value="<?= h($order['shipping_tracking']) ?>"
@@ -81,7 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking'])) {
         </form>
     </div>
 
-    <!-- Items -->
     <div class="bg-white rounded-xl shadow-sm p-5 lg:col-span-2">
         <h2 class="font-bold mb-3">Articles commandés</h2>
         <div class="space-y-3">

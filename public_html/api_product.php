@@ -1,5 +1,4 @@
 <?php
-// API endpoint to get product details for inline display
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 
@@ -31,7 +30,6 @@ $stmt = $db->prepare("SELECT * FROM product_variations WHERE product_id = ? AND 
 $stmt->execute([$id]);
 $variations = $stmt->fetchAll();
 
-// Get colors
 $stmt = $db->prepare("
     SELECT c.id, c.name, c.hex_code
     FROM product_colors pc

@@ -8,7 +8,6 @@ $orders_list = [];
 $error = '';
 $is_customer = false;
 
-// Check if customer is logged in
 $customer_id = $_SESSION['customer_id'] ?? null;
 
 if ($customer_id) {
@@ -24,7 +23,6 @@ if ($customer_id) {
     }
 }
 
-// Handle order lookup
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? 'lookup';
 
@@ -53,7 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($email && strlen($password) >= 6) {
             $hash = password_hash($password, PASSWORD_BCRYPT);
 
-            // Check if customer exists
             $stmt = $db->prepare("SELECT id FROM customers WHERE email = ?");
             $stmt->execute([$email]);
             $existing = $stmt->fetch();
@@ -94,7 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Logout
 if (isset($_GET['logout'])) {
     unset($_SESSION['customer_id']);
     header('Location: track.php');
@@ -148,7 +144,6 @@ $status_labels = [
     <?php endif; ?>
 
     <?php if ($is_customer && $orders_list): ?>
-        <!-- Customer logged in - show all orders -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <div class="p-5 border-b">
                 <h2 class="font-bold">Vos commandes</h2>
@@ -173,7 +168,6 @@ $status_labels = [
         </div>
 
     <?php elseif ($order): ?>
-        <!-- Single order view -->
         <?php $sl = $status_labels[$order['order_status']] ?? ['Inconnu', 'bg-gray-100 text-gray-500']; ?>
         <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
             <div class="flex items-center justify-between mb-4">
@@ -181,7 +175,6 @@ $status_labels = [
                 <span class="px-3 py-1 rounded-full text-xs font-medium <?= $sl[1] ?>"><?= $sl[0] ?></span>
             </div>
 
-            <!-- Progress bar -->
             <?php
             $steps = ['new', 'confirmed', 'shipped', 'delivered'];
             $current_step = array_search($order['order_status'], $steps);
@@ -215,7 +208,6 @@ $status_labels = [
                 </p>
             </div>
 
-            <!-- Items -->
             <?php $items = json_decode($order['items_json'], true) ?: []; ?>
             <?php if ($items): ?>
             <div class="mt-4 pt-4 border-t">
@@ -230,7 +222,6 @@ $status_labels = [
             <?php endif; ?>
         </div>
 
-        <!-- Create password option -->
         <?php
         $stmt = $db->prepare("SELECT id, password_hash FROM customers WHERE email = ?");
         $stmt->execute([trim($_POST['email'] ?? '')]);
@@ -257,9 +248,7 @@ $status_labels = [
         <a href="track.php" class="block mt-4 text-center text-primary-600 hover:underline text-sm">Rechercher une autre commande</a>
 
     <?php else: ?>
-        <!-- Lookup forms -->
         <div class="space-y-6">
-            <!-- Simple lookup -->
             <div class="bg-white rounded-xl shadow-sm p-6">
                 <h2 class="font-bold mb-4">Suivre une commande</h2>
                 <form method="POST" class="space-y-3">
@@ -274,7 +263,6 @@ $status_labels = [
                 </form>
             </div>
 
-            <!-- Customer login -->
             <div class="bg-white rounded-xl shadow-sm p-6">
                 <h2 class="font-bold mb-2">Vous avez un compte ?</h2>
                 <p class="text-sm text-gray-400 mb-4">Connectez-vous pour voir toutes vos commandes.</p>

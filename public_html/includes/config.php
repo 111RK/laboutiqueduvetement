@@ -1,30 +1,23 @@
 <?php
 session_start();
 
-// Database
 define('DB_PATH', __DIR__ . '/../../data/boutique.sqlite');
 
-// Site
 define('SITE_NAME', 'La Boutique du Vêtement');
 define('SITE_URL', '');
 
-// Uploads
 define('UPLOAD_DIR', __DIR__ . '/../uploads/products/');
 define('UPLOAD_URL', 'uploads/products/');
 
-// Admin password (set during install)
 define('ADMIN_PASSWORD_HASH', '$2y$10$defaulthashchangethisduringinstall');
 
-// PayPlug API
-define('PAYPLUG_SECRET_KEY', ''); // À remplir avec votre clé secrète PayPlug
-define('PAYPLUG_PUBLIC_KEY', ''); // À remplir avec votre clé publique PayPlug
-define('PAYPLUG_TEST_MODE', true); // true = mode test, false = production
+define('PAYPLUG_SECRET_KEY', '');
+define('PAYPLUG_PUBLIC_KEY', '');
+define('PAYPLUG_TEST_MODE', true);
 
-// Packlink API
-define('PACKLINK_API_KEY', ''); // À remplir avec votre clé API Packlink
+define('PACKLINK_API_KEY', '');
 define('PACKLINK_TEST_MODE', true);
 
-// Predefined sizes
 define('SIZES', json_encode([
     'adult' => [
         ['label' => 'XS',  'price' => 6.00],
@@ -43,7 +36,6 @@ define('SIZES', json_encode([
     ],
 ]));
 
-// CSRF protection
 function csrf_token() {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

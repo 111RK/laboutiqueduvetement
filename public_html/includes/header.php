@@ -43,7 +43,6 @@ $cart_count = isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-<!-- Header fixe -->
 <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <a href="index.php" class="flex items-center gap-2">
@@ -55,7 +54,6 @@ $cart_count = isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'
             <span class="font-bold text-lg hidden sm:block"><?= SITE_NAME ?></span>
         </a>
 
-        <!-- Search bar -->
         <div class="flex-1 max-w-md mx-4">
             <div class="relative">
                 <input type="text" id="search-input" placeholder="Rechercher un article..."
@@ -67,13 +65,11 @@ $cart_count = isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'
         </div>
 
         <div class="flex items-center gap-1">
-            <!-- Track order -->
             <a href="track.php" class="p-2 hover:bg-gray-100 rounded-full transition hidden sm:block" title="Suivi commande">
                 <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
             </a>
-            <!-- Cart button -->
             <button onclick="openCart()" class="relative p-2 hover:bg-gray-100 rounded-full transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
@@ -85,7 +81,6 @@ $cart_count = isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'
         </div>
     </div>
 
-    <!-- Categories pills -->
     <div class="border-t border-gray-100">
         <div class="max-w-7xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar">
             <button onclick="filterCategory('all')" class="category-pill active whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 hover:bg-primary-600 hover:text-white transition" data-cat="all">

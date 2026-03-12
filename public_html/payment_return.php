@@ -9,7 +9,6 @@ $stmt = $db->prepare("SELECT * FROM orders WHERE order_ref = ?");
 $stmt->execute([$order_ref]);
 $order = $stmt->fetch();
 
-// Check payment status with PayPlug
 if ($order && $order['payment_id'] && PAYPLUG_SECRET_KEY) {
     $ch = curl_init('https://api.payplug.com/v1/payments/' . $order['payment_id']);
     curl_setopt_array($ch, [

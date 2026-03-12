@@ -19,7 +19,6 @@ $counts = $db->query("SELECT order_status, COUNT(*) as c FROM orders GROUP BY or
 
 <h1 class="text-2xl font-bold mb-6">Commandes</h1>
 
-<!-- Status filters -->
 <div class="flex flex-wrap gap-2 mb-6">
     <a href="orders.php" class="px-4 py-1.5 rounded-full text-sm font-medium <?= !$filter ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' ?> transition">
         Toutes (<?= array_sum($counts) ?>)

@@ -1,5 +1,4 @@
 <?php
-// Packlink API integration for shipping options
 require_once __DIR__ . '/includes/config.php';
 
 header('Content-Type: application/json');
@@ -12,7 +11,6 @@ if (!$zipcode || !$city) {
     exit;
 }
 
-// If no API key configured, return default options
 if (empty(PACKLINK_API_KEY)) {
     echo json_encode([
         'options' => [
@@ -24,14 +22,13 @@ if (empty(PACKLINK_API_KEY)) {
     exit;
 }
 
-// Packlink PRO API - Search shipping services
 $api_base = PACKLINK_TEST_MODE
     ? 'https://apisandbox.packlink.com'
     : 'https://api.packlink.com';
 
 $params = http_build_query([
     'from[country]' => 'FR',
-    'from[zip]' => '75001', // Warehouse zip - to configure
+    'from[zip]' => '75001',
     'to[country]' => 'FR',
     'to[zip]' => $zipcode,
     'packages[0][width]' => 30,
@@ -56,7 +53,6 @@ $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($http_code !== 200) {
-    // Fallback to default options
     echo json_encode([
         'options' => [
             ['name' => 'Colissimo Domicile', 'price' => 4.99, 'transit_time' => '2-3 jours ouvrés'],

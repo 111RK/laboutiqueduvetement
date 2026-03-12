@@ -1,6 +1,5 @@
 </main>
 
-<!-- Cart Drawer -->
 <div id="cart-drawer" class="fixed inset-0 z-50 hidden">
     <div class="modal-backdrop absolute inset-0" onclick="closeCart()"></div>
     <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col slide-up">
@@ -27,17 +26,14 @@
     </div>
 </div>
 
-<!-- Product Modal -->
 <div id="product-modal" class="fixed inset-0 z-50 hidden">
     <div class="modal-backdrop absolute inset-0" onclick="closeProductModal()"></div>
     <div class="absolute inset-x-4 bottom-0 top-16 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl md:max-h-[85vh] bg-white rounded-t-2xl md:rounded-2xl shadow-2xl flex flex-col overflow-hidden slide-up">
         <div id="modal-content" class="flex-1 overflow-y-auto">
-            <!-- Loaded via JS -->
-        </div>
+            </div>
     </div>
 </div>
 
-<!-- Footer -->
 <footer class="bg-white border-t mt-8">
     <div class="max-w-7xl mx-auto px-4 py-6">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
@@ -49,7 +45,6 @@
     </div>
 </footer>
 
-<!-- Mobile bottom nav -->
 <nav class="fixed bottom-0 left-0 right-0 bg-white border-t sm:hidden z-40 safe-area-bottom">
     <div class="flex justify-around py-2">
         <a href="index.php" class="flex flex-col items-center gap-0.5 text-primary-600">

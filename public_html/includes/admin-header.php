@@ -23,7 +23,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-<!-- Mobile menu toggle -->
 <div class="lg:hidden bg-white shadow-sm p-4 flex items-center justify-between">
     <span class="font-bold text-primary-700"><?= SITE_NAME ?> — Admin</span>
     <button onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')" class="p-2">
@@ -32,7 +31,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
 </div>
 
 <div class="flex">
-    <!-- Sidebar -->
     <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 w-64 bg-white shadow-lg z-40 transform -translate-x-full lg:translate-x-0 transition-transform">
         <div class="p-6 border-b hidden lg:block">
             <h1 class="font-bold text-primary-700"><?= SITE_NAME ?></h1>
@@ -71,5 +69,4 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </nav>
     </aside>
 
-    <!-- Main content -->
     <main class="flex-1 p-4 lg:p-8 min-h-screen">

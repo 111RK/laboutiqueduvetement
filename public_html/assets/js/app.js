@@ -1,4 +1,3 @@
-// ==================== CATEGORY FILTER ====================
 function filterCategory(slug) {
     document.querySelectorAll('.category-pill').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.cat === slug);
@@ -14,7 +13,6 @@ function filterCategory(slug) {
     });
 }
 
-// ==================== SEARCH ====================
 const searchInput = document.getElementById('search-input');
 if (searchInput) {
     let searchTimeout;
@@ -31,7 +29,6 @@ if (searchInput) {
     });
 }
 
-// ==================== PRODUCT DETAIL (INLINE / BOTTOM SHEET) ====================
 let selectedVariationId = null;
 let selectedColorId = 0;
 let currentProductColors = [];
@@ -41,8 +38,6 @@ function openProduct(id) {
     const content = document.getElementById('modal-content');
     content.innerHTML = '<div class="flex items-center justify-center py-12"><div class="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full"></div></div>';
     modal.classList.remove('hidden');
-    // DON'T block body scroll — keep shopping possible (Amazon style)
-
     selectedVariationId = null;
     selectedColorId = 0;
 
@@ -56,7 +51,6 @@ function openProduct(id) {
 
             currentProductColors = data.colors || [];
 
-            // Colors HTML
             let colorsHtml = '';
             if (currentProductColors.length) {
                 colorsHtml = '<div class="mb-3"><p class="text-xs font-medium text-gray-500 uppercase mb-2">Couleur</p><div class="flex flex-wrap gap-2" id="color-buttons">';
@@ -64,11 +58,9 @@ function openProduct(id) {
                     colorsHtml += `<button onclick="selectColor(this, ${c.id})" class="color-btn w-9 h-9 rounded-full border-3 ${i === 0 ? 'border-primary-500 ring-2 ring-primary-200' : 'border-gray-200'} hover:scale-110 transition-transform" style="background-color:${c.hex_code}" title="${c.name}" data-cid="${c.id}"></button>`;
                 });
                 colorsHtml += '</div></div>';
-                // Auto-select first color
                 selectedColorId = currentProductColors[0].id;
             }
 
-            // Sizes HTML - compact pills
             let sizesHtml = '';
             if (data.variations && data.variations.length) {
                 const adults = data.variations.filter(v => v.size_type === 'adult');
@@ -157,14 +149,12 @@ function closeProductModal() {
     selectedColorId = 0;
 }
 
-// Close modal on backdrop click
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('modal-backdrop')) {
         closeProductModal();
     }
 });
 
-// ==================== CART (Amazon-style slide drawer) ====================
 function addToCart() {
     if (!selectedVariationId) return;
 
@@ -183,14 +173,12 @@ function addToCart() {
         .then(data => {
             updateCartBadge(data.count);
             closeProductModal();
-            // Brief notification instead of opening cart
             showCartNotification(data.count);
         });
 }
 
 function showCartNotification(count) {
-    // Quick toast notification
-    let toast = document.getElementById('cart-toast');
+        let toast = document.getElementById('cart-toast');
     if (!toast) {
         toast = document.createElement('div');
         toast.id = 'cart-toast';
@@ -214,7 +202,6 @@ function showCartNotification(count) {
 function openCart() {
     const drawer = document.getElementById('cart-drawer');
     drawer.classList.remove('hidden');
-    // Don't lock body scroll — Amazon style
     loadCart();
 }
 
@@ -309,7 +296,6 @@ function updateCartBadge(count) {
     }
 }
 
-// ==================== HELPERS ====================
 function formatPrice(price) {
     return parseFloat(price).toFixed(2).replace('.', ',') + ' €';
 }

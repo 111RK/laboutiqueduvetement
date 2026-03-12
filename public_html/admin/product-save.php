@@ -22,14 +22,12 @@ if (!$title) {
 
 $slug = slugify($title);
 
-// Ensure unique slug
 $check = $db->prepare("SELECT id FROM products WHERE slug = ? AND id != ?");
 $check->execute([$slug, $id]);
 if ($check->fetch()) {
     $slug .= '-' . substr(uniqid(), -4);
 }
 
-// Handle image
 $image = '';
 if ($id) {
     $stmt = $db->prepare("SELECT image FROM products WHERE id = ?");
@@ -51,7 +49,6 @@ if (!empty($_FILES['image']['name']) && $_FILES['image']['error'] === UPLOAD_ERR
     }
 }
 
-// Save product
 if ($id) {
     $stmt = $db->prepare("UPDATE products SET title=?, slug=?, description=?, category_id=?, image=?, sort_order=?, updated_at=datetime('now') WHERE id=?");
     $stmt->execute([$title, $slug, $description, $category_id, $image, $sort_order, $id]);
@@ -61,7 +58,6 @@ if ($id) {
     $id = $db->lastInsertId();
 }
 
-// Save variations - delete old and re-insert
 $db->prepare("DELETE FROM product_variations WHERE product_id = ?")->execute([$id]);
 
 foreach ($sizes_data as $type => $type_sizes) {
@@ -74,7 +70,6 @@ foreach ($sizes_data as $type => $type_sizes) {
     }
 }
 
-// Save colors
 $db->prepare("DELETE FROM product_colors WHERE product_id = ?")->execute([$id]);
 foreach ($colors_data as $color_id) {
     $stmt = $db->prepare("INSERT INTO product_colors (product_id, color_id) VALUES (?,?)");

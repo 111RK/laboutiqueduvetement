@@ -3,7 +3,6 @@ require_once __DIR__ . '/../includes/admin-header.php';
 
 $success = flash('success');
 
-// Handle add/edit/delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
     $action = $_POST['action'] ?? '';
@@ -49,7 +48,6 @@ $categories = $db->query("SELECT c.*, COUNT(p.id) as product_count FROM categori
     <div class="bg-green-50 text-green-700 p-3 rounded-xl mb-4 text-sm"><?= h($success) ?></div>
 <?php endif; ?>
 
-<!-- Add category form -->
 <div class="bg-white rounded-xl shadow-sm p-5 mb-6">
     <h2 class="font-bold mb-3">Ajouter une catégorie</h2>
     <form method="POST" class="flex flex-col sm:flex-row gap-3">
@@ -65,7 +63,6 @@ $categories = $db->query("SELECT c.*, COUNT(p.id) as product_count FROM categori
     </form>
 </div>
 
-<!-- Category list -->
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
     <?php if (empty($categories)): ?>
         <p class="p-8 text-center text-gray-400">Aucune catégorie. Ajoutez-en une ci-dessus.</p>
@@ -97,7 +94,6 @@ $categories = $db->query("SELECT c.*, COUNT(p.id) as product_count FROM categori
     <?php endif; ?>
 </div>
 
-<!-- Edit modal -->
 <div id="edit-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
     <div class="absolute inset-0 bg-black/30" onclick="closeEditModal()"></div>
     <div class="bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full mx-4 relative z-10">

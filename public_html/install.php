@@ -7,7 +7,6 @@ $installed = false;
 
 $db = getDB();
 
-// Create tables (one at a time for SQLite compatibility)
 $tables = [
     "CREATE TABLE IF NOT EXISTS categories (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -89,7 +88,6 @@ foreach ($tables as $sql) {
     $db->exec($sql);
 }
 
-// Set admin password
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_password'])) {
     $password = $_POST['admin_password'];
     if (strlen($password) < 6) {
@@ -107,7 +105,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_password'])) {
     }
 }
 
-// Check if already installed
 $check = $db->query("SELECT value FROM settings WHERE key='admin_password_hash'")->fetch();
 if ($check && !empty($check['value'])) {
     $installed = true;

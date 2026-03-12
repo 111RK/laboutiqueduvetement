@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/header.php';
 
-// Fetch all active products with their category and price range
 $products = $db->query("
     SELECT p.*, c.name AS category_name, c.slug AS category_slug,
            MIN(pv.price) AS min_price, MAX(pv.price) AS max_price
@@ -15,7 +14,6 @@ $products = $db->query("
 ?>
 
 <div class="max-w-7xl mx-auto px-4">
-    <!-- Product Grid -->
     <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
         <?php if (empty($products)): ?>
             <div class="col-span-full text-center py-16">

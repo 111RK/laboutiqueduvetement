@@ -1,5 +1,4 @@
 <?php
-// PayPlug webhook - called by PayPlug when payment status changes
 require_once __DIR__ . '/includes/db.php';
 
 $input = file_get_contents('php://input');

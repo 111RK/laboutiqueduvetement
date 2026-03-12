@@ -3,7 +3,6 @@ require_once __DIR__ . '/../includes/admin-header.php';
 
 $success = flash('success');
 
-// Handle color actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
     $action = $_POST['action'] ?? '';
@@ -38,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'update_api') {
-        // Save API keys in settings table
         $keys = ['payplug_secret', 'payplug_public', 'packlink_api'];
         foreach ($keys as $k) {
             $val = trim($_POST[$k] ?? '');
@@ -54,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $colors = $db->query("SELECT * FROM colors ORDER BY name")->fetchAll();
 
-// Load API settings
 $api_settings = [];
 $rows = $db->query("SELECT key, value FROM settings WHERE key IN ('payplug_secret','payplug_public','packlink_api')")->fetchAll();
 foreach ($rows as $r) $api_settings[$r['key']] = $r['value'];
@@ -68,7 +65,6 @@ foreach ($rows as $r) $api_settings[$r['key']] = $r['value'];
 
 <div class="space-y-6 max-w-2xl">
 
-    <!-- Colors Management -->
     <div class="bg-white rounded-xl shadow-sm p-5">
         <h2 class="font-bold mb-4">Couleurs</h2>
 
@@ -106,7 +102,6 @@ foreach ($rows as $r) $api_settings[$r['key']] = $r['value'];
         <?php endif; ?>
     </div>
 
-    <!-- API Keys -->
     <div class="bg-white rounded-xl shadow-sm p-5">
         <h2 class="font-bold mb-4">Clés API</h2>
         <form method="POST" class="space-y-3">
@@ -135,7 +130,6 @@ foreach ($rows as $r) $api_settings[$r['key']] = $r['value'];
         </form>
     </div>
 
-    <!-- Password -->
     <div class="bg-white rounded-xl shadow-sm p-5">
         <h2 class="font-bold mb-4">Mot de passe admin</h2>
         <form method="POST" class="flex flex-col sm:flex-row gap-3">

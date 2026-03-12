@@ -16,7 +16,6 @@ foreach ($cart as $item) {
 $errors = [];
 $shipping_options = [];
 
-// If form submitted, process order
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
 
@@ -55,8 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $order_id = $db->lastInsertId();
 
-        // Create PayPlug payment
-        $amount = (int)($total * 100); // PayPlug uses cents
+        $amount = (int)($total * 100);
 
         $payplug_data = [
             'amount' => $amount,
@@ -117,7 +115,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $db->prepare("UPDATE orders SET payment_id = ? WHERE id = ?");
             $stmt->execute([$payment_id, $order_id]);
 
-            // Redirect to PayPlug hosted payment page
             $payment_url = $payment['hosted_payment']['payment_url'] ?? '';
             if ($payment_url) {
                 $_SESSION['cart'] = [];
@@ -170,7 +167,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="POST" id="checkout-form">
         <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
 
-        <!-- Order Summary -->
         <div class="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <h2 class="font-bold mb-3">Récapitulatif</h2>
             <?php foreach ($cart as $item): ?>
@@ -188,7 +184,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <!-- Customer Info -->
         <div class="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <h2 class="font-bold mb-3">Vos informations</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -217,7 +212,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <!-- Shipping Options (Packlink) -->
         <div class="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <h2 class="font-bold mb-3">Mode de livraison</h2>
             <div id="shipping-options">
@@ -231,7 +225,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="hidden" name="shipping_cost" id="shipping_cost" value="0">
         </div>
 
-        <!-- Total + Pay -->
         <div class="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <div class="flex justify-between items-center text-lg font-bold">
                 <span>Total à payer</span>
@@ -247,7 +240,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
-    // Fetch Packlink shipping options when address is filled
     const zipField = document.querySelector('[name="zipcode"]');
     const cityField = document.querySelector('[name="city"]');
     let shippingDebounce;
@@ -302,7 +294,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 list.innerHTML = html;
                 list.classList.remove('hidden');
 
-                // Auto-select first
                 if (data.options.length) {
                     selectShipping(data.options[0].name, data.options[0].price);
                 }
@@ -314,7 +305,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById('shipping_cost').value = price;
         updateTotal(price);
 
-        // Update visual
         document.querySelectorAll('#shipping-list label').forEach(l => {
             const radio = l.querySelector('input[type=radio]');
             if (radio.checked) {

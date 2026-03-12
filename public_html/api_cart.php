@@ -1,5 +1,4 @@
 <?php
-// API endpoint to manage cart
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 
@@ -32,7 +31,6 @@ switch ($action) {
             exit;
         }
 
-        // Get color name
         $color_name = '';
         if ($color_id) {
             $stmt = $db->prepare("SELECT name FROM colors WHERE id = ?");
