@@ -436,7 +436,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     el.value = data[f];
                 }
             });
-            if (data.zipcode && data.city) checkShipping();
+            if (zipField.value.length >= 4 && cityField.value.length >= 2) {
+                fetchShipping();
+            }
         } catch(e) {}
     }
 
