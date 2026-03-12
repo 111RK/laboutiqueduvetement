@@ -1,0 +1,39 @@
+RewriteEngine On
+
+# Force HTTPS
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Clean product URLs
+RewriteRule ^produit/([a-z0-9-]+)$ produit.php?slug=$1 [L,QSA]
+
+# Block access to data directory
+RewriteRule ^data/ - [F,L]
+
+# Block access to includes
+RewriteRule ^includes/ - [F,L]
+
+# Block .sqlite files
+RewriteRule \.sqlite$ - [F,L]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Compress
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+</IfModule>
+
+# Cache static assets
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
