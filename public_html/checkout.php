@@ -200,16 +200,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="sm:col-span-2">
                     <select name="country" id="country-field"
                             class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                        <option value="FR" selected>France</option>
-                        <option value="BE">Belgique</option>
-                        <option value="LU">Luxembourg</option>
-                        <option value="DE">Allemagne</option>
-                        <option value="ES">Espagne</option>
-                        <option value="IT">Italie</option>
-                        <option value="PT">Portugal</option>
-                        <option value="NL">Pays-Bas</option>
-                        <option value="AT">Autriche</option>
-                        <option value="CH">Suisse</option>
+                        <option value="FR" selected>&#127467;&#127479; France</option>
+                        <option value="BE">&#127463;&#127466; Belgique</option>
+                        <option value="LU">&#127473;&#127482; Luxembourg</option>
+                        <option value="DE">&#127465;&#127466; Allemagne</option>
+                        <option value="ES">&#127466;&#127480; Espagne</option>
+                        <option value="IT">&#127470;&#127481; Italie</option>
+                        <option value="PT">&#127477;&#127481; Portugal</option>
+                        <option value="NL">&#127475;&#127473; Pays-Bas</option>
+                        <option value="AT">&#127462;&#127481; Autriche</option>
+                        <option value="CH">&#127464;&#127469; Suisse</option>
                     </select>
                 </div>
                 <div class="sm:col-span-2 relative">
@@ -325,6 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         zipField.value = zip;
         cityField.value = city;
         suggestionsBox.classList.add('hidden');
+        saveCustomerInfo();
         checkShipping();
     }
 
@@ -411,6 +412,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const total = subtotal + parseFloat(shippingCost);
         document.getElementById('total-display').textContent = total.toFixed(2).replace('.', ',') + ' €';
     }
+
+    const customerFields = ['name', 'email', 'phone', 'address', 'zipcode', 'city', 'country'];
+    const storageKey = 'lbv_customer';
+
+    function saveCustomerInfo() {
+        const data = {};
+        customerFields.forEach(f => {
+            const el = document.querySelector(`[name="${f}"]`);
+            if (el) data[f] = el.value;
+        });
+        localStorage.setItem(storageKey, JSON.stringify(data));
+    }
+
+    function loadCustomerInfo() {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return;
+        try {
+            const data = JSON.parse(raw);
+            customerFields.forEach(f => {
+                const el = document.querySelector(`[name="${f}"]`);
+                if (el && data[f] && !el.value) {
+                    el.value = data[f];
+                }
+            });
+            if (data.zipcode && data.city) checkShipping();
+        } catch(e) {}
+    }
+
+    customerFields.forEach(f => {
+        const el = document.querySelector(`[name="${f}"]`);
+        if (el) el.addEventListener('change', saveCustomerInfo);
+        if (el && el.tagName !== 'SELECT') el.addEventListener('input', saveCustomerInfo);
+    });
+
+    loadCustomerInfo();
 </script>
 </body>
 </html>
