@@ -7,7 +7,11 @@ $variations = [];
 $product_colors = [];
 
 $categories = $db->query("SELECT * FROM categories ORDER BY sort_order, name")->fetchAll();
-$sizes = json_decode(SIZES, true);
+$sizes = ['adult' => [], 'child' => []];
+$db_sizes = $db->query("SELECT * FROM sizes ORDER BY sort_order, label")->fetchAll();
+foreach ($db_sizes as $sz) {
+    $sizes[$sz['type']][] = ['label' => $sz['label'], 'price' => $sz['default_price']];
+}
 
 $colors_result = $db->query("SELECT * FROM colors ORDER BY name");
 $all_colors = $colors_result ? $colors_result->fetchAll() : [];

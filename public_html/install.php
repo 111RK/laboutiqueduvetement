@@ -88,10 +88,38 @@ $tables = [
         password_hash TEXT NOT NULL,
         created_at TEXT DEFAULT (datetime('now'))
     )",
+    "CREATE TABLE IF NOT EXISTS sizes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        label TEXT NOT NULL,
+        type TEXT NOT NULL DEFAULT 'adult',
+        default_price REAL NOT NULL DEFAULT 0,
+        sort_order INTEGER DEFAULT 0
+    )",
 ];
 
 foreach ($tables as $sql) {
     $db->exec($sql);
+}
+
+$sizeCount = $db->query("SELECT COUNT(*) FROM sizes")->fetchColumn();
+if ($sizeCount == 0) {
+    $defaultSizes = [
+        ['XS', 'adult', 6.00, 1],
+        ['S', 'adult', 6.00, 2],
+        ['M', 'adult', 6.00, 3],
+        ['L', 'adult', 6.00, 4],
+        ['XL', 'adult', 6.00, 5],
+        ['XXL', 'adult', 6.00, 6],
+        ['3/4 ans', 'child', 5.00, 1],
+        ['5/6 ans', 'child', 5.00, 2],
+        ['7/8 ans', 'child', 5.00, 3],
+        ['9/11 ans', 'child', 5.00, 4],
+        ['12/14 ans', 'child', 5.00, 5],
+    ];
+    $stmt = $db->prepare("INSERT INTO sizes (label, type, default_price, sort_order) VALUES (?, ?, ?, ?)");
+    foreach ($defaultSizes as $s) {
+        $stmt->execute($s);
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_password'])) {
