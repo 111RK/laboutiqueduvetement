@@ -57,13 +57,13 @@ require_once __DIR__ . '/includes/header.php';
                 <li><strong>Mondial Relay</strong> : 3 à 5 jours ouvrés</li>
                 <li><strong>Chronopost</strong> : 1 à 2 jours ouvrés</li>
             </ul>
-            <p class="mt-2">Un numéro de suivi est communiqué dès l'expédition du colis. En cas de retard de livraison, contactez-nous à contaact@laboutiqueduvetement.fr.</p>
+            <p class="mt-2">Un numéro de suivi est communiqué dès l'expédition du colis. En cas de retard de livraison, contactez-nous à contact@laboutiqueduvetement.fr.</p>
         </section>
 
         <section>
             <h2 class="text-lg font-bold text-gray-900 mb-3">7. Droit de rétractation</h2>
             <p>Conformément à l'article L221-18 du Code de la consommation, vous disposez d'un délai de <strong>14 jours calendaires</strong> à compter de la réception de votre commande pour exercer votre droit de rétractation, sans avoir à justifier de motif.</p>
-            <p class="mt-2">Pour exercer ce droit, adressez-nous un email à <strong>contaact@laboutiqueduvetement.fr</strong> en indiquant votre numéro de commande et votre souhait de rétractation.</p>
+            <p class="mt-2">Pour exercer ce droit, adressez-nous un email à <strong>contact@laboutiqueduvetement.fr</strong> en indiquant votre numéro de commande et votre souhait de rétractation.</p>
             <p class="mt-2">Les articles retournés doivent être dans leur état d'origine, non portés, non lavés, avec leurs étiquettes. Les frais de retour sont à la charge du client.</p>
             <p class="mt-2">Le remboursement sera effectué dans un délai de 14 jours suivant la réception des articles retournés, par le même moyen de paiement que celui utilisé lors de la commande.</p>
         </section>
@@ -71,7 +71,7 @@ require_once __DIR__ . '/includes/header.php';
         <section>
             <h2 class="text-lg font-bold text-gray-900 mb-3">8. Réclamations et garanties</h2>
             <p>Tous nos produits bénéficient de la garantie légale de conformité (articles L217-4 à L217-14 du Code de la consommation) et de la garantie contre les vices cachés (articles 1641 à 1649 du Code civil).</p>
-            <p class="mt-2">En cas de produit défectueux ou non conforme, contactez-nous dans les meilleurs délais à <strong>contaact@laboutiqueduvetement.fr</strong> avec une photo du défaut et votre numéro de commande.</p>
+            <p class="mt-2">En cas de produit défectueux ou non conforme, contactez-nous dans les meilleurs délais à <strong>contact@laboutiqueduvetement.fr</strong> avec une photo du défaut et votre numéro de commande.</p>
         </section>
 
         <section>

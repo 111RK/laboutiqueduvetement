@@ -17,7 +17,7 @@ require_once __DIR__ . '/includes/header.php';
             <ul class="mt-2 space-y-1">
                 <li><strong>Nom :</strong> Thomas Albert</li>
                 <li><strong>Adresse :</strong> 13 Rue de l'Arbizon, 31210 Montréjeau, France</li>
-                <li><strong>Email :</strong> contaact@laboutiqueduvetement.fr</li>
+                <li><strong>Email :</strong> contact@laboutiqueduvetement.fr</li>
             </ul>
         </section>
 
@@ -85,7 +85,7 @@ require_once __DIR__ . '/includes/header.php';
                 <li><strong>Droit à la portabilité</strong> : recevoir vos données dans un format structuré</li>
                 <li><strong>Droit d'opposition</strong> : vous opposer au traitement de vos données</li>
             </ul>
-            <p class="mt-2">Pour exercer vos droits, contactez-nous à : <strong>contaact@laboutiqueduvetement.fr</strong></p>
+            <p class="mt-2">Pour exercer vos droits, contactez-nous à : <strong>contact@laboutiqueduvetement.fr</strong></p>
             <p class="mt-2">En cas de litige, vous pouvez introduire une réclamation auprès de la CNIL (Commission Nationale de l'Informatique et des Libertés) : <strong>www.cnil.fr</strong></p>
         </section>
 

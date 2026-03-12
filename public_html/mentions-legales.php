@@ -17,7 +17,7 @@ require_once __DIR__ . '/includes/header.php';
             <ul class="mt-2 space-y-1">
                 <li><strong>Nom :</strong> Thomas Albert</li>
                 <li><strong>Adresse :</strong> 13 Rue de l'Arbizon, 31210 Montréjeau, France</li>
-                <li><strong>Email :</strong> contaact@laboutiqueduvetement.fr</li>
+                <li><strong>Email :</strong> contact@laboutiqueduvetement.fr</li>
                 <li><strong>Statut :</strong> Entrepreneur individuel</li>
             </ul>
         </section>
