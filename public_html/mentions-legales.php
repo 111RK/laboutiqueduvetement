@@ -26,10 +26,10 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="text-lg font-bold text-gray-900 mb-3">2. Hébergeur</h2>
             <p>Le site est hébergé par :</p>
             <ul class="mt-2 space-y-1">
-                <li><strong>Nom :</strong> o2switch</li>
-                <li><strong>Adresse :</strong> 222-224 Boulevard Gustave Flaubert, 63000 Clermont-Ferrand, France</li>
-                <li><strong>Téléphone :</strong> 04 44 44 60 40</li>
-                <li><strong>Site web :</strong> www.o2switch.fr</li>
+                <li><strong>Nom :</strong> WAI31</li>
+                <li><strong>Adresse :</strong> Avenue de la Poste, 31210 Gourdan-Polignan, France</li>
+                <li><strong>Téléphone :</strong> 06 95 87 28 51</li>
+                <li><strong>Site web :</strong> www.wai31.fr</li>
             </ul>
         </section>
 

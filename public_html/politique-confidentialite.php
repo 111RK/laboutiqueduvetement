@@ -60,7 +60,7 @@ require_once __DIR__ . '/includes/header.php';
             <ul class="mt-2 space-y-1 list-disc list-inside">
                 <li><strong>PayPlug</strong> : prestataire de paiement sécurisé</li>
                 <li><strong>Packlink</strong> : prestataire d'expédition et de livraison</li>
-                <li><strong>o2switch</strong> : hébergeur du site</li>
+                <li><strong>WAI31</strong> : hébergeur du site</li>
             </ul>
             <p class="mt-2">Aucune donnée n'est transférée en dehors de l'Union européenne.</p>
         </section>
