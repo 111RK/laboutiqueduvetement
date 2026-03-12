@@ -34,26 +34,28 @@ $last_name = $name_parts[1] ?? $name_parts[0];
 
 // Sender info (your shop)
 $from = [
-    'city' => 'Montréjeau',
+    'first_name' => 'Thomas',
+    'last_name' => 'Albert',
     'company' => 'La Boutique du Vêtement',
-    'country' => 'FR',
-    'email' => 'contact@laboutiqueduvetement.fr',
-    'name' => 'Thomas Albert',
-    'phone' => '0695872851',
     'street1' => '13 Rue de l\'Arbizon',
     'zip_code' => '31210',
+    'city' => 'Montréjeau',
+    'country' => 'FR',
+    'phone' => '0695872851',
+    'email' => 'contact@laboutiqueduvetement.fr',
 ];
 
-// Recipient - use relay point address if available
+// Recipient
 $to_address = $order['relay_point_address'] ?: $order['customer_address'];
 $to = [
-    'city' => $order['customer_city'],
-    'country' => $order['customer_country'] ?: 'FR',
-    'email' => $order['customer_email'],
-    'name' => $order['customer_name'],
-    'phone' => $order['customer_phone'] ?: '',
+    'first_name' => $first_name,
+    'last_name' => $last_name,
     'street1' => $to_address,
     'zip_code' => $order['customer_zipcode'],
+    'city' => $order['customer_city'],
+    'country' => $order['customer_country'] ?: 'FR',
+    'phone' => $order['customer_phone'] ?: '',
+    'email' => $order['customer_email'],
 ];
 
 // Parse items for weight/value
@@ -61,6 +63,12 @@ $items = json_decode($order['items_json'], true) ?: [];
 $total_qty = 0;
 foreach ($items as $item) {
     $total_qty += $item['qty'] ?? 1;
+}
+
+// Build items description
+$content_desc = [];
+foreach ($items as $item) {
+    $content_desc[] = ($item['qty'] ?? 1) . 'x ' . ($item['title'] ?? 'Article');
 }
 
 $shipment_data = [
@@ -74,16 +82,28 @@ $shipment_data = [
             'weight' => max(0.5, $total_qty * 0.3),
         ]
     ],
-    'content' => 'clothing',
+    'content' => implode(', ', $content_desc),
     'contentvalue' => (float)$order['subtotal'],
     'content_second_hand' => false,
     'source' => 'PRO',
     'order_reference' => $order['order_ref'],
 ];
 
-// Add service_id if stored
+// Add service_id - required for Packlink to select the carrier
 if (!empty($order['shipping_service_id'])) {
     $shipment_data['service_id'] = (int)$order['shipping_service_id'];
+} else {
+    // Try to find matching service by name from cached carriers
+    $cached_raw = $db->query("SELECT value FROM settings WHERE key = 'cached_carriers'")->fetchColumn();
+    $cached = $cached_raw ? json_decode($cached_raw, true) : [];
+    $method = strtolower($order['shipping_method'] ?? '');
+    foreach ($cached as $c) {
+        $full = strtolower($c['carrier_name'] . ' - ' . $c['name']);
+        if ($method && ($full === $method || strpos($full, $method) !== false || strpos($method, strtolower($c['carrier_name'])) !== false)) {
+            $shipment_data['service_id'] = (int)$c['id'];
+            break;
+        }
+    }
 }
 
 // Add dropoff point if relay
@@ -105,11 +125,8 @@ if ($result['code'] >= 200 && $result['code'] < 300 && !empty($result['body']['r
     $stmt = $db->prepare("UPDATE orders SET shipping_tracking = ?, updated_at = datetime('now') WHERE id = ?");
     $stmt->execute(['PL-' . $reference, $order_id]);
 
-    // Build Packlink Pro URL
-    $base = (defined('PACKLINK_TEST_MODE') && PACKLINK_TEST_MODE)
-        ? 'https://sandbox.pro.packlink.com'
-        : 'https://pro.packlink.com';
-    $url = $base . '/private/shipments/' . $reference;
+    // Always use production Packlink Pro URL (key is live)
+    $url = 'https://pro.packlink.com/private/shipments/' . $reference;
 
     echo json_encode([
         'success' => true,
@@ -121,7 +138,14 @@ if ($result['code'] >= 200 && $result['code'] < 300 && !empty($result['body']['r
     if (!empty($result['body']['message'])) {
         $error_msg .= ': ' . $result['body']['message'];
     } elseif (!empty($result['body']['messages'])) {
-        $error_msg .= ': ' . implode(', ', (array)$result['body']['messages']);
+        $msgs = $result['body']['messages'];
+        if (is_array($msgs)) {
+            $flat = [];
+            array_walk_recursive($msgs, function($v) use (&$flat) { $flat[] = $v; });
+            $error_msg .= ': ' . implode(', ', $flat);
+        } else {
+            $error_msg .= ': ' . $msgs;
+        }
     }
     echo json_encode(['error' => $error_msg, 'debug' => $result['body']]);
 }
