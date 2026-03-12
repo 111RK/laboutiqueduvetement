@@ -197,20 +197,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="tel" name="phone" placeholder="Téléphone"
                        value="<?= h($_POST['phone'] ?? '') ?>"
                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                <div class="sm:col-span-2">
-                    <select name="country" id="country-field"
-                            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                        <option value="FR" selected>&#127467;&#127479; France</option>
-                        <option value="BE">&#127463;&#127466; Belgique</option>
-                        <option value="LU">&#127473;&#127482; Luxembourg</option>
-                        <option value="DE">&#127465;&#127466; Allemagne</option>
-                        <option value="ES">&#127466;&#127480; Espagne</option>
-                        <option value="IT">&#127470;&#127481; Italie</option>
-                        <option value="PT">&#127477;&#127481; Portugal</option>
-                        <option value="NL">&#127475;&#127473; Pays-Bas</option>
-                        <option value="AT">&#127462;&#127481; Autriche</option>
-                        <option value="CH">&#127464;&#127469; Suisse</option>
-                    </select>
+                <div class="sm:col-span-2 relative">
+                    <input type="hidden" name="country" id="country-field" value="FR">
+                    <div id="country-select" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm cursor-pointer flex items-center gap-2 hover:border-gray-300 transition bg-white" onclick="toggleCountryDropdown()">
+                        <img id="country-flag" src="https://flagcdn.com/w40/fr.png" alt="FR" class="w-6 h-4 object-cover rounded-sm">
+                        <span id="country-label">France</span>
+                        <svg class="w-4 h-4 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                    <div id="country-dropdown" class="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-40 hidden max-h-60 overflow-y-auto">
+                        <?php
+                        $countries = [
+                            'FR' => 'France', 'BE' => 'Belgique', 'LU' => 'Luxembourg',
+                            'DE' => 'Allemagne', 'ES' => 'Espagne', 'IT' => 'Italie',
+                            'PT' => 'Portugal', 'NL' => 'Pays-Bas', 'AT' => 'Autriche', 'CH' => 'Suisse'
+                        ];
+                        foreach ($countries as $code => $label): ?>
+                            <div class="flex items-center gap-3 px-4 py-2.5 hover:bg-primary-50 cursor-pointer text-sm transition" onclick="pickCountry('<?= $code ?>', '<?= $label ?>')">
+                                <img src="https://flagcdn.com/w40/<?= strtolower($code) ?>.png" alt="<?= $code ?>" class="w-6 h-4 object-cover rounded-sm">
+                                <span><?= $label ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
                 <div class="sm:col-span-2 relative">
                     <input type="text" name="address" id="address-field" placeholder="Adresse" required autocomplete="off"
@@ -255,6 +262,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
+    function toggleCountryDropdown() {
+        document.getElementById('country-dropdown').classList.toggle('hidden');
+    }
+
+    function pickCountry(code, label) {
+        document.getElementById('country-field').value = code;
+        document.getElementById('country-flag').src = 'https://flagcdn.com/w40/' + code.toLowerCase() + '.png';
+        document.getElementById('country-flag').alt = code;
+        document.getElementById('country-label').textContent = label;
+        document.getElementById('country-dropdown').classList.add('hidden');
+        saveCustomerInfo();
+    }
+
+    document.addEventListener('click', function(e) {
+        const sel = document.getElementById('country-select');
+        const dd = document.getElementById('country-dropdown');
+        if (!sel.contains(e.target) && !dd.contains(e.target)) {
+            dd.classList.add('hidden');
+        }
+    });
+
     const addressField = document.getElementById('address-field');
     const zipField = document.getElementById('zipcode-field');
     const cityField = document.getElementById('city-field');
@@ -425,6 +453,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         localStorage.setItem(storageKey, JSON.stringify(data));
     }
 
+    const countryNames = {FR:'France',BE:'Belgique',LU:'Luxembourg',DE:'Allemagne',ES:'Espagne',IT:'Italie',PT:'Portugal',NL:'Pays-Bas',AT:'Autriche',CH:'Suisse'};
+
     function loadCustomerInfo() {
         const raw = localStorage.getItem(storageKey);
         if (!raw) return;
@@ -436,6 +466,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     el.value = data[f];
                 }
             });
+            if (data.country && countryNames[data.country]) {
+                document.getElementById('country-field').value = data.country;
+                document.getElementById('country-flag').src = 'https://flagcdn.com/w40/' + data.country.toLowerCase() + '.png';
+                document.getElementById('country-label').textContent = countryNames[data.country];
+            }
             if (zipField.value.length >= 4 && cityField.value.length >= 2) {
                 fetchShipping();
             }
