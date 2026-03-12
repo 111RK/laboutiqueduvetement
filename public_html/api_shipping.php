@@ -67,10 +67,19 @@ if ($http_code !== 200) {
 $services = json_decode($response, true);
 $options = [];
 
+// Load enabled carriers filter from admin settings
+$db = getDB();
+$enabled_raw = $db->query("SELECT value FROM settings WHERE key = 'enabled_carriers'")->fetchColumn();
+$enabled_ids = $enabled_raw ? json_decode($enabled_raw, true) : [];
+
 // Carriers known to be pickup/relay services
 $pickup_carriers = ['mondial relay', 'chrono2shop', 'chronopost shop', 'point relais', 'relay', 'shop2shop', 'pick up', 'pickup'];
 
-foreach (array_slice($services, 0, 8) as $service) {
+foreach ($services as $service) {
+    // Filter: if admin has configured enabled carriers, only show those
+    if (!empty($enabled_ids) && !in_array((int)($service['id'] ?? 0), $enabled_ids)) {
+        continue;
+    }
     $carrier = strtolower($service['carrier_name'] ?? '');
     $name = strtolower($service['name'] ?? '');
     $full = $carrier . ' ' . $name;

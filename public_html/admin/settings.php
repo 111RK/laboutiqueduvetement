@@ -34,6 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if ($action === 'save_carriers') {
+        $enabled = $_POST['carriers'] ?? [];
+        $stmt = $db->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+        $stmt->execute(['enabled_carriers', json_encode(array_map('intval', $enabled))]);
+        flash('success', 'Transporteurs mis à jour.');
+    }
+
     if ($action === 'update_api') {
         $keys = [
             'payplug_test_secret', 'payplug_test_public',
@@ -145,6 +152,58 @@ $payplug_mode = $api_settings['payplug_mode'] ?? 'test';
         </form>
     </div>
 
+    <!-- Transporteurs -->
+    <div class="bg-white rounded-xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold">Transporteurs</h2>
+            <button type="button" onclick="loadCarriers()" id="load-carriers-btn"
+                    class="text-primary-600 text-sm font-medium hover:underline flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Rafraîchir la liste
+            </button>
+        </div>
+        <p class="text-xs text-gray-400 mb-4">Activez uniquement les transporteurs que vous souhaitez proposer à vos clients.</p>
+
+        <?php
+        $enabled_raw = $db->query("SELECT value FROM settings WHERE key = 'enabled_carriers'")->fetchColumn();
+        $enabled_carriers = $enabled_raw ? json_decode($enabled_raw, true) : [];
+        $cached_raw = $db->query("SELECT value FROM settings WHERE key = 'cached_carriers'")->fetchColumn();
+        $cached_carriers = $cached_raw ? json_decode($cached_raw, true) : [];
+        ?>
+
+        <form method="POST" id="carriers-form">
+            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+            <input type="hidden" name="action" value="save_carriers">
+
+            <div id="carriers-list" class="space-y-2">
+                <?php if (empty($cached_carriers)): ?>
+                    <p class="text-sm text-gray-400 py-4 text-center">Cliquez sur "Rafraîchir la liste" pour charger les transporteurs disponibles depuis Packlink.</p>
+                <?php else: ?>
+                    <?php foreach ($cached_carriers as $c): ?>
+                        <label class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 cursor-pointer hover:bg-gray-100 transition">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" name="carriers[]" value="<?= (int)$c['id'] ?>"
+                                       <?= in_array((int)$c['id'], $enabled_carriers) ? 'checked' : '' ?>
+                                       class="w-4 h-4 text-primary-600 rounded focus:ring-primary-500">
+                                <div>
+                                    <p class="text-sm font-medium"><?= h($c['carrier_name'] . ' — ' . $c['name']) ?></p>
+                                    <p class="text-xs text-gray-400">
+                                        <?= h($c['transit_time'] ?? '') ?>
+                                        <?= !empty($c['pickup']) ? ' · Point relais' : ' · Domicile' ?>
+                                        · À partir de <?= number_format($c['price'] ?? 0, 2, ',', ' ') ?> €
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+                    <?php endforeach; ?>
+                    <button type="submit" class="mt-3 bg-primary-600 text-white px-6 py-2 rounded-xl text-sm font-medium hover:bg-primary-700 transition">
+                        Enregistrer la sélection
+                    </button>
+                <?php endif; ?>
+            </div>
+        </form>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm p-5">
         <h2 class="font-bold mb-4">Comptes administrateurs</h2>
 
@@ -196,6 +255,57 @@ function togglePayplugMode() {
     document.getElementById('mode-badge').classList.toggle('text-orange-500', !isLive);
 }
 togglePayplugMode();
+
+function loadCarriers() {
+    const btn = document.getElementById('load-carriers-btn');
+    const list = document.getElementById('carriers-list');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="animate-spin w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full"></div> Chargement...';
+    list.innerHTML = '<div class="text-center py-6"><div class="animate-spin w-6 h-6 border-4 border-primary-600 border-t-transparent rounded-full mx-auto"></div><p class="text-sm text-gray-400 mt-2">Chargement des transporteurs depuis Packlink...</p></div>';
+
+    fetch('ajax/load-carriers.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'csrf_token=<?= csrf_token() ?>'
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Rafraîchir la liste';
+
+        if (data.error) {
+            list.innerHTML = '<p class="text-red-500 text-sm py-4 text-center">' + data.error + '</p>';
+            return;
+        }
+        if (!data.carriers || !data.carriers.length) {
+            list.innerHTML = '<p class="text-gray-400 text-sm py-4 text-center">Aucun transporteur trouvé.</p>';
+            return;
+        }
+
+        const enabled = data.enabled || [];
+        let html = '';
+        data.carriers.forEach(c => {
+            const checked = enabled.includes(c.id) ? 'checked' : '';
+            const pickupBadge = c.pickup ? ' · Point relais' : ' · Domicile';
+            html += `<label class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 cursor-pointer hover:bg-gray-100 transition">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" name="carriers[]" value="${c.id}" ${checked}
+                           class="w-4 h-4 text-primary-600 rounded focus:ring-primary-500">
+                    <div>
+                        <p class="text-sm font-medium">${c.carrier_name} — ${c.name}</p>
+                        <p class="text-xs text-gray-400">${c.transit_time || ''}${pickupBadge} · À partir de ${parseFloat(c.price).toFixed(2).replace('.', ',')} €</p>
+                    </div>
+                </div>
+            </label>`;
+        });
+        html += '<button type="submit" class="mt-3 bg-primary-600 text-white px-6 py-2 rounded-xl text-sm font-medium hover:bg-primary-700 transition">Enregistrer la sélection</button>';
+        list.innerHTML = html;
+    })
+    .catch(() => {
+        btn.disabled = false;
+        list.innerHTML = '<p class="text-red-500 text-sm py-4 text-center">Erreur de connexion</p>';
+    });
+}
 </script>
 
 <?php require_once __DIR__ . '/../includes/admin-footer.php'; ?>
