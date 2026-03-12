@@ -82,6 +82,12 @@ $tables = [
         key TEXT PRIMARY KEY,
         value TEXT
     )",
+    "CREATE TABLE IF NOT EXISTS admins (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        login TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now'))
+    )",
 ];
 
 foreach ($tables as $sql) {

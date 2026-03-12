@@ -5,19 +5,23 @@ require_once __DIR__ . '/../includes/db.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $login = trim($_POST['login'] ?? '');
     $password = $_POST['password'] ?? '';
     $db = getDB();
 
-    $stmt = $db->query("SELECT value FROM settings WHERE key = 'admin_password_hash'");
-    $row = $stmt->fetch();
+    $stmt = $db->prepare("SELECT * FROM admins WHERE login = ?");
+    $stmt->execute([$login]);
+    $admin = $stmt->fetch();
 
-    if ($row && password_verify($password, $row['value'])) {
+    if ($admin && password_verify($password, $admin['password_hash'])) {
         $_SESSION['admin_logged_in'] = true;
+        $_SESSION['admin_login'] = $admin['login'];
+        $_SESSION['admin_id'] = $admin['id'];
         header('Location: index.php');
         exit;
     }
 
-    $error = 'Mot de passe incorrect.';
+    $error = 'Identifiants incorrects.';
 }
 ?>
 <!DOCTYPE html>
@@ -46,7 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="POST">
-            <input type="password" name="password" placeholder="Mot de passe" required autofocus
+            <input type="text" name="login" placeholder="Login" required autofocus
+                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-3 focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+            <input type="password" name="password" placeholder="Mot de passe" required
                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 focus:ring-2 focus:ring-teal-500 focus:border-transparent">
             <button type="submit" class="w-full bg-teal-600 text-white py-2.5 rounded-xl font-medium hover:bg-teal-700 transition">
                 Se connecter

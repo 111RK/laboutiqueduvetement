@@ -34,7 +34,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 w-64 bg-white shadow-lg z-40 transform -translate-x-full lg:translate-x-0 transition-transform">
         <div class="p-6 border-b hidden lg:block">
             <h1 class="font-bold text-primary-700"><?= SITE_NAME ?></h1>
-            <p class="text-xs text-gray-400 mt-1">Panneau d'administration</p>
+            <p class="text-xs text-gray-400 mt-1">Connecté : <strong><?= h($_SESSION['admin_login'] ?? 'Admin') ?></strong></p>
         </div>
         <nav class="p-4 space-y-1">
             <a href="index.php" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium <?= $current_page === 'index.php' ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' ?>">
