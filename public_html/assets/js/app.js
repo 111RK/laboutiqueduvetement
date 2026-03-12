@@ -173,7 +173,7 @@ function addToCart() {
         .then(data => {
             updateCartBadge(data.count);
             closeProductModal();
-            showCartNotification(data.count);
+            openCart();
         });
 }
 
@@ -201,12 +201,12 @@ function showCartNotification(count) {
 
 function openCart() {
     const drawer = document.getElementById('cart-drawer');
-    drawer.classList.remove('hidden');
+    drawer.classList.remove('translate-x-full');
     loadCart();
 }
 
 function closeCart() {
-    document.getElementById('cart-drawer').classList.add('hidden');
+    document.getElementById('cart-drawer').classList.add('translate-x-full');
 }
 
 function loadCart() {
