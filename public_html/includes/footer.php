@@ -38,8 +38,11 @@
     <div class="max-w-7xl mx-auto px-4 py-6">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
             <p>&copy; <?= date('Y') ?> <?= SITE_NAME ?> — Tous droits réservés</p>
-            <div class="flex gap-4">
+            <div class="flex flex-wrap gap-4">
                 <a href="track.php" class="hover:text-primary-600 transition">Suivi de commande</a>
+                <a href="mentions-legales.php" class="hover:text-primary-600 transition">Mentions légales</a>
+                <a href="cgv.php" class="hover:text-primary-600 transition">CGV</a>
+                <a href="politique-confidentialite.php" class="hover:text-primary-600 transition">Confidentialité</a>
             </div>
         </div>
     </div>
