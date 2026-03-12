@@ -37,23 +37,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $shipping_method = $_POST['shipping_method'] ?? '';
     $shipping_cost = (float)($_POST['shipping_cost'] ?? 0);
+    $shipping_service_id = $_POST['shipping_service_id'] ?? '';
+    $relay_point_id = $_POST['relay_point_id'] ?? '';
+    $relay_point_name = $_POST['relay_point_name'] ?? '';
+    $relay_point_address = $_POST['relay_point_address'] ?? '';
 
     if (empty($errors)) {
         $total = $subtotal + $shipping_cost;
         $order_ref = 'LBV-' . strtoupper(substr(md5(uniqid()), 0, 8));
 
         $db = getDB();
+        $name = $firstname . ' ' . $lastname;
+
+        // Use relay address for shipping if relay point selected
+        $ship_address = $relay_point_address ?: $address;
+        $ship_city = $city;
+        $ship_zipcode = $zipcode;
+
         $stmt = $db->prepare("
             INSERT INTO orders (order_ref, customer_name, customer_email, customer_phone,
                 customer_address, customer_city, customer_zipcode, customer_country, items_json,
-                subtotal, shipping_cost, shipping_method, total, payment_status, order_status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'new')
+                subtotal, shipping_cost, shipping_method, shipping_service_id,
+                relay_point_id, relay_point_name, relay_point_address,
+                total, payment_status, order_status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'new')
         ");
-        $name = $firstname . ' ' . $lastname;
         $stmt->execute([
             $order_ref, $name, $email, $phone,
             $address, $city, $zipcode, $country, json_encode(array_values($cart)),
-            $subtotal, $shipping_cost, $shipping_method, $total
+            $subtotal, $shipping_cost, $shipping_method, $shipping_service_id,
+            $relay_point_id, $relay_point_name, $relay_point_address, $total
         ]);
 
         $order_id = $db->lastInsertId();
@@ -76,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'first_name' => $firstname,
                 'last_name' => $lastname,
                 'email' => $email,
-                'address1' => $address,
+                'address1' => $relay_point_address ?: $address,
                 'postcode' => $zipcode,
                 'city' => $city,
                 'country' => $country,
@@ -249,6 +262,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <input type="hidden" name="shipping_method" id="shipping_method" value="">
             <input type="hidden" name="shipping_cost" id="shipping_cost" value="0">
+            <input type="hidden" name="shipping_service_id" id="shipping_service_id" value="">
+            <input type="hidden" name="relay_point_id" id="relay_point_id" value="">
+            <input type="hidden" name="relay_point_name" id="relay_point_name" value="">
+            <input type="hidden" name="relay_point_address" id="relay_point_address" value="">
+
+            <!-- Relay point selection -->
+            <div id="relay-section" class="mt-3 hidden">
+                <div id="relay-selected" class="hidden bg-primary-50 border border-primary-200 rounded-xl p-3 mb-2">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-sm" id="relay-selected-name"></p>
+                            <p class="text-xs text-gray-500" id="relay-selected-addr"></p>
+                        </div>
+                        <button type="button" onclick="openRelayModal()" class="text-primary-600 text-xs font-medium hover:underline">Changer</button>
+                    </div>
+                </div>
+                <button type="button" id="relay-pick-btn" onclick="openRelayModal()"
+                        class="w-full border-2 border-dashed border-primary-300 rounded-xl p-3 text-sm text-primary-600 font-medium hover:bg-primary-50 transition flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Choisir un point relais
+                </button>
+            </div>
         </div>
 
         <div class="bg-white rounded-xl p-4 mb-4 shadow-sm">
@@ -265,7 +300,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 </div>
 
+<!-- Relay point modal -->
+<div id="relay-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50" onclick="closeRelayModal()"></div>
+    <div class="absolute inset-x-4 bottom-0 top-20 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg md:max-h-[80vh] bg-white rounded-t-2xl md:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        <div class="p-4 border-b flex items-center justify-between flex-shrink-0">
+            <h3 class="font-bold">Choisir un point relais</h3>
+            <button onclick="closeRelayModal()" class="p-1 hover:bg-gray-100 rounded-full">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="relay-list" class="flex-1 overflow-y-auto p-4">
+            <div class="text-center py-8">
+                <div class="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto"></div>
+                <p class="text-sm text-gray-400 mt-3">Recherche des points relais...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    let currentShippingOptions = [];
+    let currentServiceId = '';
+    let currentIsPickup = false;
+
     function toggleCountryDropdown() {
         document.getElementById('country-dropdown').classList.toggle('hidden');
     }
@@ -377,13 +435,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     function fetchShipping() {
         const zip = zipField.value.trim();
         const city = cityField.value.trim();
+        const country = countryField.value;
         if (zip.length < 4 || city.length < 2) return;
 
         document.getElementById('shipping-placeholder').classList.add('hidden');
         document.getElementById('shipping-loading').classList.remove('hidden');
         document.getElementById('shipping-list').classList.add('hidden');
+        resetRelay();
 
-        fetch('api_shipping.php?zipcode=' + encodeURIComponent(zip) + '&city=' + encodeURIComponent(city))
+        fetch('api_shipping.php?zipcode=' + encodeURIComponent(zip) + '&city=' + encodeURIComponent(city) + '&country=' + encodeURIComponent(country))
             .then(r => r.json())
             .then(data => {
                 document.getElementById('shipping-loading').classList.add('hidden');
@@ -398,16 +458,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     return;
                 }
 
+                currentShippingOptions = data.options;
                 let html = '';
                 data.options.forEach((opt, i) => {
+                    const pickupBadge = opt.pickup ? '<span class="inline-block bg-blue-100 text-blue-600 text-[10px] px-1.5 py-0.5 rounded-full ml-1">Point relais</span>' : '';
                     html += `
                         <label class="flex items-center gap-3 p-3 border-2 rounded-xl cursor-pointer hover:border-primary-300 transition ${i === 0 ? 'border-primary-500 bg-primary-50' : 'border-gray-200'}">
                             <input type="radio" name="shipping_radio" value="${i}" ${i === 0 ? 'checked' : ''}
-                                   onchange="selectShipping('${opt.name}', ${opt.price})"
+                                   onchange="selectShipping(${i})"
                                    class="text-primary-600">
                             <div class="flex-1">
-                                <p class="font-medium text-sm">${opt.name}</p>
-                                <p class="text-xs text-gray-400">${opt.transit_time || ''}</p>
+                                <p class="font-medium text-sm">${esc(opt.name)}${pickupBadge}</p>
+                                <p class="text-xs text-gray-400">${esc(opt.transit_time || '')}</p>
                             </div>
                             <span class="font-bold text-sm">${parseFloat(opt.price).toFixed(2).replace('.', ',')} €</span>
                         </label>
@@ -417,16 +479,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 list.classList.remove('hidden');
 
                 if (data.options.length) {
-                    selectShipping(data.options[0].name, data.options[0].price);
+                    selectShipping(0);
                 }
             });
     }
 
-    function selectShipping(name, price) {
-        document.getElementById('shipping_method').value = name;
-        document.getElementById('shipping_cost').value = price;
-        updateTotal(price);
+    function selectShipping(idx) {
+        const opt = currentShippingOptions[idx];
+        if (!opt) return;
 
+        document.getElementById('shipping_method').value = opt.name;
+        document.getElementById('shipping_cost').value = opt.price;
+        document.getElementById('shipping_service_id').value = opt.service_id || '';
+        currentServiceId = opt.service_id || '';
+        currentIsPickup = !!opt.pickup;
+        updateTotal(opt.price);
+
+        // Highlight selected
         document.querySelectorAll('#shipping-list label').forEach(l => {
             const radio = l.querySelector('input[type=radio]');
             if (radio.checked) {
@@ -437,6 +506,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 l.classList.add('border-gray-200');
             }
         });
+
+        // Show/hide relay section
+        const relaySection = document.getElementById('relay-section');
+        if (currentIsPickup) {
+            relaySection.classList.remove('hidden');
+            resetRelay();
+        } else {
+            relaySection.classList.add('hidden');
+            resetRelay();
+        }
+    }
+
+    function resetRelay() {
+        document.getElementById('relay_point_id').value = '';
+        document.getElementById('relay_point_name').value = '';
+        document.getElementById('relay_point_address').value = '';
+        document.getElementById('relay-selected').classList.add('hidden');
+        document.getElementById('relay-pick-btn').classList.remove('hidden');
+    }
+
+    function openRelayModal() {
+        const modal = document.getElementById('relay-modal');
+        modal.classList.remove('hidden');
+
+        const zip = zipField.value.trim();
+        const country = countryField.value;
+
+        if (!currentServiceId || !zip) {
+            document.getElementById('relay-list').innerHTML = '<p class="text-center text-gray-400 py-8">Impossible de charger les points relais</p>';
+            return;
+        }
+
+        document.getElementById('relay-list').innerHTML = '<div class="text-center py-8"><div class="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto"></div><p class="text-sm text-gray-400 mt-3">Recherche des points relais...</p></div>';
+
+        fetch('api_dropoffs.php?service_id=' + encodeURIComponent(currentServiceId) + '&country=' + encodeURIComponent(country) + '&zipcode=' + encodeURIComponent(zip))
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('relay-list');
+                if (!data.points || !data.points.length) {
+                    container.innerHTML = '<p class="text-center text-gray-400 py-8">Aucun point relais trouvé à proximité</p>';
+                    return;
+                }
+
+                let html = '';
+                data.points.forEach(p => {
+                    const addr = esc(p.address) + ', ' + esc(p.zipcode) + ' ' + esc(p.city);
+                    html += `
+                        <div class="p-3 border-2 border-gray-200 rounded-xl mb-2 cursor-pointer hover:border-primary-400 transition"
+                             onclick="pickRelay('${escAttr(p.id)}', '${escAttr(p.name)}', '${escAttr(p.address + ', ' + p.zipcode + ' ' + p.city)}')">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <div>
+                                    <p class="font-medium text-sm">${esc(p.name)}</p>
+                                    <p class="text-xs text-gray-500">${addr}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            })
+            .catch(() => {
+                document.getElementById('relay-list').innerHTML = '<p class="text-center text-red-400 py-8">Erreur lors du chargement</p>';
+            });
+    }
+
+    function closeRelayModal() {
+        document.getElementById('relay-modal').classList.add('hidden');
+    }
+
+    function pickRelay(id, name, address) {
+        document.getElementById('relay_point_id').value = id;
+        document.getElementById('relay_point_name').value = name;
+        document.getElementById('relay_point_address').value = address;
+
+        document.getElementById('relay-selected-name').textContent = name;
+        document.getElementById('relay-selected-addr').textContent = address;
+        document.getElementById('relay-selected').classList.remove('hidden');
+        document.getElementById('relay-pick-btn').classList.add('hidden');
+
+        closeRelayModal();
     }
 
     const subtotal = <?= $subtotal ?>;

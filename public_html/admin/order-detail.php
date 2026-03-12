@@ -40,7 +40,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking'])) {
         <p class="text-sm text-gray-500 mt-2">
             <?= h($order['customer_address']) ?><br>
             <?= h($order['customer_zipcode']) ?> <?= h($order['customer_city']) ?>
+            <?= !empty($order['customer_country']) && $order['customer_country'] !== 'FR' ? ' (' . h($order['customer_country']) . ')' : '' ?>
         </p>
+
+        <?php if (!empty($order['relay_point_name'])): ?>
+            <div class="mt-3 pt-3 border-t">
+                <p class="text-xs font-medium text-blue-600 uppercase mb-1">
+                    <svg class="w-4 h-4 inline -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Point relais
+                </p>
+                <p class="text-sm font-medium"><?= h($order['relay_point_name']) ?></p>
+                <p class="text-xs text-gray-500"><?= h($order['relay_point_address']) ?></p>
+            </div>
+        <?php endif; ?>
     </div>
 
     <div class="bg-white rounded-xl shadow-sm p-5">
@@ -70,11 +82,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking'])) {
 
         <form method="POST" class="mt-4 flex gap-2">
             <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-            <input type="text" name="tracking" value="<?= h($order['shipping_tracking']) ?>"
+            <input type="text" name="tracking" value="<?= h($order['shipping_tracking'] ?? '') ?>"
                    placeholder="N° de suivi"
                    class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-primary-500">
             <button type="submit" class="bg-primary-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition">Sauver</button>
         </form>
+
+        <!-- Packlink button -->
+        <div class="mt-4 pt-4 border-t">
+            <button onclick="createPacklinkShipment(<?= $order['id'] ?>)" id="packlink-btn"
+                    class="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                Envoyer sur Packlink
+            </button>
+            <div id="packlink-result" class="mt-2 hidden"></div>
+        </div>
     </div>
 
     <div class="bg-white rounded-xl shadow-sm p-5 lg:col-span-2">
@@ -106,5 +128,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking'])) {
         </div>
     </div>
 </div>
+
+<script>
+function createPacklinkShipment(orderId) {
+    const btn = document.getElementById('packlink-btn');
+    const result = document.getElementById('packlink-result');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div> Envoi en cours...';
+
+    const formData = new FormData();
+    formData.append('order_id', orderId);
+    formData.append('csrf_token', '<?= csrf_token() ?>');
+
+    fetch('ajax/packlink-shipment.php', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            result.classList.remove('hidden');
+            if (data.success && data.url) {
+                result.innerHTML = `
+                    <div class="bg-green-50 border border-green-200 rounded-xl p-3">
+                        <p class="text-green-700 text-sm font-medium">Envoi créé sur Packlink !</p>
+                        <p class="text-xs text-green-600 mt-1">Référence : ${data.reference}</p>
+                        <a href="${data.url}" target="_blank" rel="noopener"
+                           class="mt-2 inline-block bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">
+                            Ouvrir dans Packlink Pro &rarr;
+                        </a>
+                    </div>
+                `;
+                btn.classList.add('hidden');
+            } else {
+                result.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-xl p-3"><p class="text-red-600 text-sm">${data.error || 'Erreur inconnue'}</p></div>`;
+                btn.disabled = false;
+                btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg> Réessayer Packlink';
+            }
+        })
+        .catch(() => {
+            result.classList.remove('hidden');
+            result.innerHTML = '<div class="bg-red-50 border border-red-200 rounded-xl p-3"><p class="text-red-600 text-sm">Erreur de connexion</p></div>';
+            btn.disabled = false;
+            btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg> Réessayer Packlink';
+        });
+}
+</script>
 
 <?php require_once __DIR__ . '/../includes/admin-footer.php'; ?>

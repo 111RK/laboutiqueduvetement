@@ -96,6 +96,42 @@ function flash($key, $message = null) {
     }
 }
 
+function get_packlink_key() {
+    $db = getDB();
+    $row = $db->query("SELECT value FROM settings WHERE key = 'packlink_api'")->fetch();
+    return $row ? $row['value'] : '';
+}
+
+function get_packlink_base() {
+    return defined('PACKLINK_TEST_MODE') && PACKLINK_TEST_MODE
+        ? 'https://apisandbox.packlink.com'
+        : 'https://api.packlink.com';
+}
+
+function packlink_request($method, $endpoint, $data = null) {
+    $key = get_packlink_key();
+    if (!$key) return ['error' => 'Clé Packlink non configurée'];
+
+    $url = get_packlink_base() . $endpoint;
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            'Authorization: ' . $key,
+            'Content-Type: application/json',
+        ],
+    ]);
+    if ($method === 'POST') {
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    }
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    return ['code' => $http_code, 'body' => json_decode($response, true)];
+}
+
 function get_payplug_keys() {
     $db = getDB();
     $rows = $db->query("SELECT key, value FROM settings WHERE key IN ('payplug_mode','payplug_test_secret','payplug_test_public','payplug_live_secret','payplug_live_public')")->fetchAll();
