@@ -19,7 +19,8 @@ $shipping_options = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
 
-    $name = trim($_POST['name'] ?? '');
+    $firstname = trim($_POST['firstname'] ?? '');
+    $lastname = trim($_POST['lastname'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     $address = trim($_POST['address'] ?? '');
@@ -27,7 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $zipcode = trim($_POST['zipcode'] ?? '');
     $country = trim($_POST['country'] ?? 'FR');
 
-    if (!$name) $errors[] = 'Nom requis';
+    if (!$firstname) $errors[] = 'Prénom requis';
+    if (!$lastname) $errors[] = 'Nom requis';
     if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Email valide requis';
     if (!$address) $errors[] = 'Adresse requise';
     if (!$city) $errors[] = 'Ville requise';
@@ -47,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 subtotal, shipping_cost, shipping_method, total, payment_status, order_status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'new')
         ");
+        $name = $firstname . ' ' . $lastname;
         $stmt->execute([
             $order_ref, $name, $email, $phone,
             $address, $city, $zipcode, $country, json_encode(array_values($cart)),
@@ -61,8 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'amount' => $amount,
             'currency' => 'EUR',
             'billing' => [
-                'first_name' => explode(' ', $name)[0],
-                'last_name' => implode(' ', array_slice(explode(' ', $name), 1)) ?: $name,
+                'first_name' => $firstname,
+                'last_name' => $lastname,
                 'email' => $email,
                 'address1' => $address,
                 'postcode' => $zipcode,
@@ -70,8 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'country' => $country,
             ],
             'shipping' => [
-                'first_name' => explode(' ', $name)[0],
-                'last_name' => implode(' ', array_slice(explode(' ', $name), 1)) ?: $name,
+                'first_name' => $firstname,
+                'last_name' => $lastname,
                 'email' => $email,
                 'address1' => $address,
                 'postcode' => $zipcode,
@@ -186,11 +189,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <h2 class="font-bold mb-3">Vos informations</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div class="sm:col-span-2">
-                    <input type="text" name="name" placeholder="Nom complet" required
-                           value="<?= h($_POST['name'] ?? '') ?>"
-                           class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                </div>
+                <input type="text" name="firstname" placeholder="Prénom" required
+                       value="<?= h($_POST['firstname'] ?? '') ?>"
+                       class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <input type="text" name="lastname" placeholder="Nom" required
+                       value="<?= h($_POST['lastname'] ?? '') ?>"
+                       class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
                 <input type="email" name="email" placeholder="Email" required
                        value="<?= h($_POST['email'] ?? '') ?>"
                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
@@ -441,7 +445,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById('total-display').textContent = total.toFixed(2).replace('.', ',') + ' €';
     }
 
-    const customerFields = ['name', 'email', 'phone', 'address', 'zipcode', 'city', 'country'];
+    const customerFields = ['firstname', 'lastname', 'email', 'phone', 'address', 'zipcode', 'city', 'country'];
     const storageKey = 'lbv_customer';
 
     function saveCustomerInfo() {
