@@ -83,11 +83,8 @@ foreach (array_slice($services, 0, 8) as $service) {
             break;
         }
     }
-    // Also check Packlink flags
-    if (!empty($service['drop_off_available']) || !empty($service['dropoff_available'])) {
-        $is_pickup = true;
-    }
-    if (isset($service['category']) && in_array($service['category'], ['pickup_point', 'drop_off'])) {
+    // Also check Packlink flags from API response
+    if (!empty($service['dropoff']) || !empty($service['delivery_to_parcelshop'])) {
         $is_pickup = true;
     }
 

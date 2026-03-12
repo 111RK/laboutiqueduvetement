@@ -29,14 +29,15 @@ $points = [];
 foreach (array_slice($result['body'], 0, 20) as $p) {
     $points[] = [
         'id' => $p['id'] ?? '',
-        'name' => $p['name'] ?? $p['commerce_name'] ?? '',
+        'name' => $p['commerce_name'] ?? $p['name'] ?? '',
         'address' => $p['address'] ?? $p['street'] ?? '',
         'city' => $p['city'] ?? '',
-        'zipcode' => $p['zip_code'] ?? $p['postal_code'] ?? $p['zipcode'] ?? '',
+        'zipcode' => $p['zip'] ?? $p['zip_code'] ?? $p['postal_code'] ?? '',
         'country' => $p['country'] ?? $country,
+        'carrier' => $p['carrier'] ?? '',
         'lat' => $p['lat'] ?? $p['latitude'] ?? null,
-        'lon' => $p['lon'] ?? $p['longitude'] ?? null,
-        'opening_hours' => $p['opening_hours'] ?? $p['openingHours'] ?? null,
+        'lon' => $p['long'] ?? $p['lon'] ?? $p['longitude'] ?? null,
+        'opening_hours' => $p['opening_times'] ?? $p['opening_hours'] ?? null,
     ];
 }
 

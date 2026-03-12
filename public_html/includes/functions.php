@@ -103,7 +103,10 @@ function get_packlink_key() {
 }
 
 function get_packlink_base() {
-    return defined('PACKLINK_TEST_MODE') && PACKLINK_TEST_MODE
+    $db = getDB();
+    $row = $db->query("SELECT value FROM settings WHERE key = 'packlink_mode'")->fetch();
+    $mode = $row ? $row['value'] : 'live';
+    return $mode === 'test'
         ? 'https://apisandbox.packlink.com'
         : 'https://api.packlink.com';
 }
